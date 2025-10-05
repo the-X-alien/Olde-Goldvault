@@ -11,6 +11,8 @@
       --paper: #fffaf0;
       --paper-2: #deb887;
       --accent: #a0522d;
+      --positive: #006400;
+      --negative: #8b0000;
     }
     body {
       margin: 0;
@@ -87,6 +89,12 @@
     }
     .stock-table th {
       background: var(--paper-2);
+    }
+    .positive {
+      color: var(--positive);
+    }
+    .negative {
+      color: var(--negative);
     }
   </style>
 </head>
@@ -179,12 +187,30 @@
         var priceCell = document.createElement('td');
         priceCell.textContent = stocks[i].price;
         var changeCell = document.createElement('td');
-        changeCell.textContent = '0.00';
+        changeCell.textContent = stocks[i].change.toFixed(2);
+        if (stocks[i].change > 0) {
+          changeCell.className = 'positive';
+          changeCell.textContent = '+' + stocks[i].change.toFixed(2);
+        } else if (stocks[i].change < 0) {
+          changeCell.className = 'negative';
+        }
         newRow.appendChild(nameCell);
         newRow.appendChild(priceCell);
         newRow.appendChild(changeCell);
         stockTableBody.appendChild(newRow);
       }
+    }
+    function updateStocks() {
+      for (var i = 0; i < stocks.length; i++) {
+        var priceChange = Math.random() * 10 - 5;
+        stocks[i].change = priceChange;
+        var newPrice = stocks[i].price + priceChange;
+        if (newPrice < 1) {
+          newPrice = 1;
+        }
+        stocks[i].price = Math.floor(newPrice);
+      }
+      renderStocks();
     }
     var creditDropdown = document.getElementById('credit');
     creditDropdown.onchange = function() {
@@ -237,6 +263,7 @@
     };
     document.addEventListener('DOMContentLoaded', function() {
       renderStocks();
+      setInterval(updateStocks, 3000);
     });
   </script>
 </body>
