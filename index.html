@@ -9,6 +9,7 @@
     :root {
       --border: #8b5a2b;
       --paper: #fffaf0;
+      --accent: #a0522d;
     }
     body {
       margin: 0;
@@ -43,6 +44,28 @@
       background: var(--paper);
       font-size: 1rem;
     }
+    button {
+      margin-top: 16px;
+      padding: 12px 18px;
+      font-size: 1.05rem;
+      border: none;
+      border-radius: 10px;
+      background: var(--border);
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: var(--accent);
+    }
+    #output {
+      margin-top: 18px;
+      padding: 12px;
+      min-height: 80px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.65);
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -66,6 +89,13 @@
     </div>
     <label for="score">Reveal thy credit score (300–850):</label>
     <input id="score" type="number" min="300" max="850" placeholder="300 - 850">
+    <label for="months">How many moons to repay thy loan?</label>
+    <input id="months" type="number" min="1" placeholder="Number of months">
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="submitBank" type="button">Submit Thy Request</button>
+      <button id="resetBank" type="button">Reset Form</button>
+    </div>
+    <div id="output" aria-live="polite"></div>
   </div>
   <script>
     var creditDropdown = document.getElementById('credit');
@@ -82,6 +112,27 @@
         creditSection.style.display = 'none';
         loanSection.style.display = 'none';
       }
+    };
+    var resetButton = document.getElementById('resetBank');
+    resetButton.onclick = function() {
+      var nameInput = document.getElementById('name');
+      nameInput.value = '';
+      var creditInput = document.getElementById('credit');
+      creditInput.value = '';
+      var limitInput = document.getElementById('limit');
+      limitInput.value = '';
+      var loanInput = document.getElementById('loan');
+      loanInput.value = '';
+      var scoreInput = document.getElementById('score');
+      scoreInput.value = '';
+      var monthsInput = document.getElementById('months');
+      monthsInput.value = '';
+      var creditSection = document.getElementById('creditLimitSection');
+      creditSection.style.display = 'none';
+      var loanSection = document.getElementById('loanAmountSection');
+      loanSection.style.display = 'none';
+      var outputBox = document.getElementById('output');
+      outputBox.textContent = '';
     };
   </script>
 </body>
