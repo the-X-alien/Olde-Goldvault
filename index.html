@@ -9,6 +9,7 @@
     :root {
       --border: #8b5a2b;
       --paper: #fffaf0;
+      --paper-2: #deb887;
       --accent: #a0522d;
     }
     body {
@@ -73,6 +74,20 @@
       font-weight: 700;
       margin-top: 12px;
     }
+    .stock-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    .stock-table th, .stock-table td {
+      border: 1px solid var(--border);
+      padding: 8px;
+      text-align: center;
+      background: var(--paper);
+    }
+    .stock-table th {
+      background: var(--paper-2);
+    }
   </style>
 </head>
 <body>
@@ -104,6 +119,19 @@
       <button id="resetBank" type="button">Reset Form</button>
     </div>
     <div id="output" aria-live="polite"></div>
+    <div style="margin-top:28px;">
+      <h1>Ye Olde Stock Exchange</h1>
+      <table class="stock-table">
+        <thead>
+          <tr>
+            <th>Guild</th>
+            <th>Price (Gold)</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody id="stockBody"></tbody>
+      </table>
+    </div>
   </div>
   <script>
     var gold = 100;
