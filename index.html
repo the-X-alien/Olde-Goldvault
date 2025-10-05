@@ -144,8 +144,12 @@
       <h1>Thy Portfolio</h1>
       <div>Gold Balance: <span id="goldBalance">100</span> 🪙</div>
       <div style="margin-top:12px;">Credit Used: <span id="creditUsed">0</span> / <span id="creditLimit">0</span> 🪙</div>
+      <div style="margin-top:12px;">Loan Balance: <span id="loanBalance">0</span> 🪙</div>
       <div style="margin-top:12px;">Total Portfolio Value: <span id="portfolioValue">100</span> 🪙</div>
-      <button id="resetPortfolio" type="button" style="margin-top:12px;">Reset Portfolio</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+        <button id="resetPortfolio" type="button">Reset Portfolio</button>
+        <button id="repayLoan" type="button">Repay Loan</button>
+      </div>
       <table class="stock-table" style="margin-top:12px;">
         <thead>
           <tr>
@@ -299,6 +303,9 @@
           totalValue = totalValue + (portfolio[guildName].shares * stockFound.price);
         }
       }
+      if (activeLoan != null) {
+        totalValue = totalValue - activeLoan.totalRepayment;
+      }
       return Math.floor(totalValue);
     }
     function renderPortfolio() {
@@ -339,6 +346,12 @@
       creditUsedElement.textContent = Math.floor(creditUsed);
       var creditLimitElement = document.getElementById('creditLimit');
       creditLimitElement.textContent = Math.floor(creditLimit);
+      var loanBalanceElement = document.getElementById('loanBalance');
+      if (activeLoan != null) {
+        loanBalanceElement.textContent = activeLoan.totalRepayment.toFixed(2);
+      } else {
+        loanBalanceElement.textContent = '0';
+      }
     }
     function resetPortfolio() {
       gold = 100;
@@ -349,6 +362,28 @@
       creditUsed = 0;
       renderPortfolio();
       renderTransactionHistory();
+    }
+    function repayLoan() {
+      var outputBox = document.getElementById('output');
+      if (activeLoan == null) {
+        outputBox.textContent = 'No active loan to repay.';
+        return;
+      }
+      var payment = activeLoan.monthlyPayment;
+      if (gold < payment) {
+        outputBox.textContent = 'Not enough gold to make loan payment of ' + payment.toFixed(2) + ' gold.';
+        return;
+      }
+      gold = gold - payment;
+      activeLoan.totalRepayment = activeLoan.totalRepayment - payment;
+      activeLoan.months = activeLoan.months - 1;
+      if (activeLoan.months <= 0 || activeLoan.totalRepayment <= 0) {
+        outputBox.textContent = 'Loan fully repaid!';
+        activeLoan = null;
+      } else {
+        outputBox.textContent = 'Loan payment of ' + payment.toFixed(2) + ' gold made. ' + activeLoan.months + ' months remaining.';
+      }
+      renderPortfolio();
     }
     function populateStockDropdown() {
       var stockDropdown = document.getElementById('selectedStock');
@@ -617,6 +652,8 @@
     tradeButton.onclick = executeTrade;
     var resetPortfolioButton = document.getElementById('resetPortfolio');
     resetPortfolioButton.onclick = resetPortfolio;
+    var repayLoanButton = document.getElementById('repayLoan');
+    repayLoanButton.onclick = repayLoan;
     document.addEventListener('DOMContentLoaded', function() {
       renderStocks();
       renderPortfolio();
