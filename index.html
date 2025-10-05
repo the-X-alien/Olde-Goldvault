@@ -144,6 +144,7 @@
       <h1>Thy Portfolio</h1>
       <div>Gold Balance: <span id="goldBalance">100</span> 🪙</div>
       <div style="margin-top:12px;">Total Portfolio Value: <span id="portfolioValue">100</span> 🪙</div>
+      <button id="resetPortfolio" type="button" style="margin-top:12px;">Reset Portfolio</button>
       <table class="stock-table" style="margin-top:12px;">
         <thead>
           <tr>
@@ -330,6 +331,13 @@
       headerBalanceElement.textContent = Math.floor(gold);
       var portfolioValueElement = document.getElementById('portfolioValue');
       portfolioValueElement.textContent = calculatePortfolioValue();
+    }
+    function resetPortfolio() {
+      gold = 100;
+      portfolio = {};
+      transactionHistory = [];
+      renderPortfolio();
+      renderTransactionHistory();
     }
     function populateStockDropdown() {
       var stockDropdown = document.getElementById('selectedStock');
@@ -526,6 +534,8 @@
     };
     var tradeButton = document.getElementById('executeTrade');
     tradeButton.onclick = executeTrade;
+    var resetPortfolioButton = document.getElementById('resetPortfolio');
+    resetPortfolioButton.onclick = resetPortfolio;
     document.addEventListener('DOMContentLoaded', function() {
       renderStocks();
       renderPortfolio();
