@@ -334,8 +334,18 @@
         portfolio[selectedStock].shares = newShares;
         portfolio[selectedStock].avgBuyPrice = newAvgPrice;
         tradeResult.textContent = 'Bought ' + tradeAmount + ' shares of ' + selectedStock + ' for ' + totalCost + ' gold.';
-      } else {
-        tradeResult.textContent = 'Selling not yet implemented.';
+      } else if (tradeType == 'sell') {
+        if (portfolio[selectedStock] == undefined || portfolio[selectedStock].shares < tradeAmount) {
+          tradeResult.textContent = 'Not enough shares to sell ' + tradeAmount + ' of ' + selectedStock + '.';
+          return;
+        }
+        var totalSale = stockFound.price * tradeAmount;
+        gold = gold + totalSale;
+        portfolio[selectedStock].shares = portfolio[selectedStock].shares - tradeAmount;
+        tradeResult.textContent = 'Sold ' + tradeAmount + ' shares of ' + selectedStock + ' for ' + totalSale + ' gold.';
+        if (portfolio[selectedStock].shares == 0) {
+          delete portfolio[selectedStock];
+        }
       }
       renderPortfolio();
     }
