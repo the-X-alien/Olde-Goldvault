@@ -140,9 +140,25 @@
         <tbody id="stockBody"></tbody>
       </table>
     </div>
+    <div style="margin-top:28px;">
+      <h1>Thy Portfolio</h1>
+      <div>Gold Balance: <span id="goldBalance">100</span> 🪙</div>
+      <table class="stock-table" style="margin-top:12px;">
+        <thead>
+          <tr>
+            <th>Guild</th>
+            <th>Shares</th>
+            <th>Avg Buy Price</th>
+            <th>Current Price</th>
+          </tr>
+        </thead>
+        <tbody id="portfolioBody"></tbody>
+      </table>
+    </div>
   </div>
   <script>
     var gold = 100;
+    var portfolio = {};
     var guildNames = [];
     guildNames[0] = "Blacksmith Bros";
     guildNames[1] = "Golden Anvil Co";
@@ -211,6 +227,38 @@
         stocks[i].price = Math.floor(newPrice);
       }
       renderStocks();
+      renderPortfolio();
+    }
+    function renderPortfolio() {
+      var portfolioBody = document.getElementById('portfolioBody');
+      portfolioBody.innerHTML = '';
+      for (var guildName in portfolio) {
+        var stockFound = null;
+        for (var i = 0; i < stocks.length; i++) {
+          if (stocks[i].name == guildName) {
+            stockFound = stocks[i];
+            break;
+          }
+        }
+        if (stockFound != null && portfolio[guildName].shares > 0) {
+          var newRow = document.createElement('tr');
+          var nameCell = document.createElement('td');
+          nameCell.textContent = guildName;
+          var sharesCell = document.createElement('td');
+          sharesCell.textContent = portfolio[guildName].shares;
+          var avgPriceCell = document.createElement('td');
+          avgPriceCell.textContent = portfolio[guildName].avgBuyPrice.toFixed(2);
+          var currentPriceCell = document.createElement('td');
+          currentPriceCell.textContent = stockFound.price;
+          newRow.appendChild(nameCell);
+          newRow.appendChild(sharesCell);
+          newRow.appendChild(avgPriceCell);
+          newRow.appendChild(currentPriceCell);
+          portfolioBody.appendChild(newRow);
+        }
+      }
+      var goldBalanceElement = document.getElementById('goldBalance');
+      goldBalanceElement.textContent = Math.floor(gold);
     }
     var creditDropdown = document.getElementById('credit');
     creditDropdown.onchange = function() {
@@ -263,6 +311,7 @@
     };
     document.addEventListener('DOMContentLoaded', function() {
       renderStocks();
+      renderPortfolio();
       setInterval(updateStocks, 3000);
     });
   </script>
