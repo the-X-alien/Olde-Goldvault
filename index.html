@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Olde Goldvault</title>
+  <title>Olde Goldvault & Stock Exchange</title>
   <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -11,19 +11,22 @@
       --paper: #fffaf0;
       --paper-2: #deb887;
       --accent: #a0522d;
-      --positive: #006400;
-      --negative: #8b0000;
+      --dark-bg: #2f2f2f;
+      --dark-paper: #3b3b3b;
+      --text-dark: #3b2f2f;
     }
+
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
+      min-height: 100vh;
       font-family: 'MedievalSharp', cursive;
       background: linear-gradient(45deg,#f4e4bc 0%,#e8d5a3 50%,#dcc485 100%);
-      text-align: center;
+      color: var(--text-dark);
+      line-height: 1.4;
     }
-    h1 {
-      margin: 18px 0;
-      font-size: 2.6rem;
-    }
+
     .container {
       max-width: 940px;
       margin: 36px auto;
@@ -33,12 +36,30 @@
       border-radius: 16px;
       box-shadow: 0 6px 30px rgba(0,0,0,0.45);
     }
+
+    h1 {
+      margin: 0 0 18px;
+      text-align: center;
+      font-size: 2.6rem;
+    }
+
+    h2 {
+      margin: 18px 0 10px;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    h3 {
+      margin: 16px 0 8px;
+    }
+
     label {
       display: block;
       margin-top: 16px;
       font-size: 1.05rem;
     }
-    input, select {
+
+    input[type="text"], input[type="number"], select {
       width: 100%;
       padding: 10px;
       margin-top: 8px;
@@ -47,6 +68,7 @@
       background: var(--paper);
       font-size: 1rem;
     }
+
     button {
       margin-top: 16px;
       padding: 12px 18px;
@@ -57,9 +79,11 @@
       color: #fff;
       cursor: pointer;
     }
+
     button:hover {
       background: var(--accent);
     }
+
     #output {
       margin-top: 18px;
       padding: 12px;
@@ -69,6 +93,7 @@
       background: rgba(255,255,255,0.65);
       white-space: pre-wrap;
     }
+
     #topCoinBalance {
       width: 100%;
       text-align: center;
@@ -76,57 +101,175 @@
       font-weight: 700;
       margin-top: 12px;
     }
+
+    .header-controls {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 1000;
+    }
+
+    .center-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .center-section > * {
+      width: 100%;
+      max-width: 760px;
+    }
+
     .stock-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 12px;
     }
+
     .stock-table th, .stock-table td {
       border: 1px solid var(--border);
       padding: 8px;
       text-align: center;
       background: var(--paper);
     }
+
     .stock-table th {
       background: var(--paper-2);
     }
-    .positive {
-      color: var(--positive);
+
+    #tradeHistory {
+      max-height: 260px;
+      overflow: auto;
+      padding: 12px;
+      background: var(--paper);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      list-style: none;
+      margin: 0;
     }
-    .negative {
-      color: var(--negative);
+
+    #tradeHistory li {
+      margin-bottom: 6px;
+    }
+
+    .loan-box {
+      margin: 10px 0;
+      padding: 14px;
+      background: var(--paper);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .medieval-popup {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(245,222,179,0.97);
+      border: 3px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      max-width: 440px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      z-index: 2000;
+    }
+
+    .medieval-popup button {
+      margin-top: 12px;
+      background: var(--border);
+    }
+
+    body.dark {
+      background: var(--dark-bg);
+      color: #f5f5dc;
+    }
+
+    body.dark .container {
+      background: rgba(45,45,45,0.95);
+      border-color: #d2b48c;
+    }
+
+    body.dark input, body.dark select {
+      background: var(--dark-paper);
+      color: #f5f5dc;
+    }
+
+    body.dark .stock-table th {
+      background: #4b4b4b;
+      color: #f5f5dc;
+    }
+
+    body.dark .stock-table td {
+      background: #3b3b3b;
+      color: #f5f5dc;
+    }
+
+    body.dark #tradeHistory {
+      background: #3b3b3b;
+      color: #f5f5dc;
+    }
+
+    @media (max-width: 780px) {
+      .container {
+        width: 92%;
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      button, input, select {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
 <body>
   <div id="topCoinBalance">Coins: <span id="headerGoldBalance">100</span> 🪙</div>
+
+  <div class="header-controls">
+    <button id="darkToggle" type="button" title="Toggle dark mode">🌙</button>
+  </div>
+
   <div class="container">
     <h1>Olde Goldvault</h1>
+
     <label for="name">What be thy name?</label>
     <input id="name" type="text" placeholder="Enter thy name">
+
     <label for="credit">Dost thou seek a line of credit or a loan?</label>
     <select id="credit">
       <option value="" selected disabled>Select...</option>
       <option value="credit">Credit</option>
       <option value="loan">Loan</option>
     </select>
+
     <div id="creditLimitSection" style="display:none;">
       <label for="limit">Declare thy desired credit limit:</label>
       <input id="limit" type="number" min="0" placeholder="Desired credit limit">
     </div>
+
     <div id="loanAmountSection" style="display:none;">
       <label for="loan">State thy loan amount:</label>
       <input id="loan" type="number" min="0" placeholder="Loan amount">
     </div>
+
     <label for="score">Reveal thy credit score (300–850):</label>
     <input id="score" type="number" min="300" max="850" placeholder="300 - 850">
+
     <label for="months">How many moons to repay thy loan?</label>
     <input id="months" type="number" min="1" placeholder="Number of months">
+
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button id="submitBank" type="button">Submit Thy Request</button>
       <button id="resetBank" type="button">Reset Form</button>
     </div>
+
     <div id="output" aria-live="polite"></div>
+
     <div style="margin-top:28px;">
       <h1>Ye Olde Stock Exchange</h1>
       <table class="stock-table">
@@ -135,24 +278,57 @@
             <th>Guild</th>
             <th>Price (Gold)</th>
             <th>Change</th>
-            <th>Volatility</th>
           </tr>
         </thead>
         <tbody id="stockBody"></tbody>
       </table>
     </div>
-    <div style="margin-top:28px;">
-      <h1>Thy Portfolio</h1>
-      <div>Gold Balance: <span id="goldBalance">100</span> 🪙</div>
-      <div style="margin-top:12px;">Credit Used: <span id="creditUsed">0</span> / <span id="creditLimit">0</span> 🪙</div>
-      <div style="margin-top:12px;">Loan Balance: <span id="loanBalance">0</span> 🪙</div>
-      <div style="margin-top:12px;">Total Portfolio Value: <span id="portfolioValue">100</span> 🪙</div>
-      <div style="margin-top:12px;">Portfolio Performance: <span id="portfolioPerformance">0</span> 🪙</div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-        <button id="resetPortfolio" type="button">Reset Portfolio</button>
-        <button id="repayLoan" type="button">Repay Loan</button>
-        <button id="repayCredit" type="button">Repay Credit</button>
+  </div>
+
+  <div class="container center-section">
+    <div style="width:100%;">
+      <h2>Gambling Den</h2>
+      <button id="gambleBtn" type="button">Gamble!</button>
+      <div id="coinFlipResult" style="margin-top:8px;"></div>
+    </div>
+
+    <div id="creditCardSection" style="display:none; width:100%;">
+      <h2>Credit Remaining: <span id="availableCredit">0</span> coins</h2>
+    </div>
+
+    <div style="width:100%;">
+      <h2>Trade Thy Holdings</h2>
+      <label for="selectedStock">Choose thy Guild to trade:</label>
+      <select id="selectedStock"></select>
+
+      <label for="tradeType">Will thou Buy or Sell?</label>
+      <select id="tradeType">
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+      </select>
+
+      <label for="tradeAmount">How many shares?</label>
+      <input id="tradeAmount" type="number" min="1" placeholder="Number of shares">
+
+      <div id="paymentMethodSection" style="display:none; margin-top:10px;">
+        <label for="paymentMethod">Choose thy payment method:</label>
+        <select id="paymentMethod">
+          <option value="gold">Use Gold Balance</option>
+          <option value="credit">Use Available Credit</option>
+        </select>
       </div>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button id="executeTrade" type="button">Execute Trade</button>
+        <button id="buyOneQuick" type="button" style="display:none;">Buy 1 (Quick)</button>
+      </div>
+
+      <div id="tradeResult" style="margin-top:14px;"></div>
+    </div>
+
+    <div style="width:100%;">
+      <h2>Thy Portfolio</h2>
+      <div>Gold Balance: <span id="goldBalance">100</span> 🪙</div>
       <table class="stock-table" style="margin-top:12px;">
         <thead>
           <tr>
@@ -160,63 +336,63 @@
             <th>Shares</th>
             <th>Avg Buy Price</th>
             <th>Current Price</th>
+            <th>Value (Gold)</th>
+            <th>Profit/Loss</th>
+            <th>Sell All</th>
+            <th>Buy 1</th>
           </tr>
         </thead>
         <tbody id="portfolioBody"></tbody>
       </table>
     </div>
-    <div style="margin-top:28px;">
-      <h1>Trade Thy Holdings</h1>
-      <label for="selectedStock">Choose thy Guild to trade:</label>
-      <select id="selectedStock"></select>
-      <label for="tradeType">Will thou Buy or Sell?</label>
-      <select id="tradeType">
-        <option value="buy">Buy</option>
-        <option value="sell">Sell</option>
-      </select>
-      <label for="tradeAmount">How many shares?</label>
-      <input id="tradeAmount" type="number" min="1" placeholder="Number of shares">
-      <button id="executeTrade" type="button">Execute Trade</button>
-      <div id="tradeResult" style="margin-top:14px;"></div>
+  </div>
+
+  <div class="container center-section">
+    <h2>Thy Ledger of Trades</h2>
+    <ul id="tradeHistory"></ul>
+
+    <div style="width:100%;">
+      <h2>Manage Thy Debts</h2>
+      <div id="loanContainer"></div>
+
+      <div id="creditManagement" style="display:none; margin:12px 0; padding:14px; background:var(--paper); border:2px solid var(--border); border-radius:10px;">
+        <h3>Active Credit Line</h3>
+        <div>Credit Limit: <span id="creditLimitDisplay">0</span> coins</div>
+        <div>Available Credit: <span id="availableCreditDisplay">0</span> coins</div>
+        <div>Monthly Fee: <span id="creditFeeDisplay">0</span> coins</div>
+        <button id="cancelCreditBtn" type="button" style="background:#d2691e;">Cancel Credit Line</button>
+      </div>
     </div>
-    <div style="margin-top:28px;">
-      <h1>Stock History</h1>
-      <label for="historyStock">Select Guild to view history:</label>
-      <select id="historyStock" onchange="renderStockHistory()"></select>
-      <table class="stock-table" style="margin-top:12px;">
-        <thead>
-          <tr>
-            <th>Update</th>
-            <th>Price (Gold)</th>
-          </tr>
-        </thead>
-        <tbody id="historyBody"></tbody>
-      </table>
+
+    <div id="creditBalanceSection" style="display:none; width:100%; padding:14px; background:var(--paper); border-radius:10px; border:2px solid var(--border);">
+      <h3>Credit Card Balance</h3>
+      <div>Outstanding Balance: <span id="creditBalanceDisplay">0</span> coins</div>
+      <div>Interest Rate: <span id="creditRateDisplay">0</span>% APR</div>
     </div>
-    <div style="margin-top:28px;">
-      <h1>Transaction History</h1>
-      <table class="stock-table">
-        <thead>
-          <tr>
-            <th>Type</th>
-            <th>Guild</th>
-            <th>Shares</th>
-            <th>Price (Gold)</th>
-            <th>Total (Gold)</th>
-          </tr>
-        </thead>
-        <tbody id="transactionBody"></tbody>
-      </table>
+
+    <div style="width:100%; margin-top:18px;">
+      <h2>Thy Noble Title: <span id="nobleTitle">Peasant</span></h2>
+      <button id="resetProgressBtn" type="button">Reset Thy Journey</button>
     </div>
   </div>
+
+  <div class="container center-section">
+    <button id="toggleMusic" type="button">Toggle Music</button>
+    <audio id="tavernMusic" src="medieval-citytavern-ambient-235876.mp3" loop></audio>
+  </div>
+
   <script>
     var gold = 100;
-    var initialInvestment = 100;
     var portfolio = {};
-    var transactionHistory = [];
-    var activeLoan = null;
+    var tradeEntries = [];
+    var loans = [];
     var creditLimit = 0;
-    var creditUsed = 0;
+    var creditBalance = 0;
+    var creditMonthlyFee = 0;
+    var creditAnnualRate = 0;
+    var allowAlerts = true;
+    var currentTitle = 'Peasant';
+
     var guildNames = [];
     guildNames[0] = "Blacksmith Bros";
     guildNames[1] = "Golden Anvil Co";
@@ -238,9 +414,99 @@
     guildNames[17] = "Shadow Creek Goods";
     guildNames[18] = "Starlight Textiles";
     guildNames[19] = "River Stone Quarry";
+    guildNames[20] = "Golden Wheat Co";
+    guildNames[21] = "Silver Bell Taverns";
+    guildNames[22] = "Copper Coin Bank";
+    guildNames[23] = "Jade Mountain Tea";
+    guildNames[24] = "Ruby Red Wine";
+    guildNames[25] = "Sapphire Jewelry";
+    guildNames[26] = "Diamond Dust Mining";
+    guildNames[27] = "Pearl Harbor Trading";
+    guildNames[28] = "Amber Light Candles";
+    guildNames[29] = "Ivory Tower Books";
+    guildNames[30] = "Bronze Shield Security";
+    guildNames[31] = "Platinum Partners";
+    guildNames[32] = "Steel Works United";
+    guildNames[33] = "Coal Creek Energy";
+    guildNames[34] = "Salt Water Solutions";
+    guildNames[35] = "Honey Bee Farms";
+    guildNames[36] = "Maple Leaf Syrup";
+    guildNames[37] = "Pine Forest Lumber";
+    guildNames[38] = "Oak Tree Furniture";
+    guildNames[39] = "Willow Branch Baskets";
+    guildNames[40] = "Rose Petal Perfumes";
+    guildNames[41] = "Lavender Fields";
+    guildNames[42] = "Mint Leaf Medicine";
+    guildNames[43] = "Sage Wisdom Scrolls";
+    guildNames[44] = "Thyme & Spice Co";
+    guildNames[45] = "Crimson Cloak Tailors";
+    guildNames[46] = "Azure Sky Shipping";
+    guildNames[47] = "Verdant Valley Produce";
+    guildNames[48] = "Cobalt Blue Dyes";
+    guildNames[49] = "Scarlet Thread Weavers";
+    guildNames[50] = "Northern Winds Trading";
+    guildNames[51] = "Southern Cross Merchants";
+    guildNames[52] = "Eastern Dawn Exports";
+    guildNames[53] = "Western Sunset Imports";
+    guildNames[54] = "Central Market Hub";
+    guildNames[55] = "Highland Stone Works";
+    guildNames[56] = "Lowland Marsh Goods";
+    guildNames[57] = "Mountain Peak Supplies";
+    guildNames[58] = "Valley Floor Mills";
+    guildNames[59] = "Riverside Commerce";
+    guildNames[60] = "Forest Edge Outfitters";
+    guildNames[61] = "Desert Bloom Trading";
+    guildNames[62] = "Tundra Fox Furs";
+    guildNames[63] = "Tropical Fruit Co";
+    guildNames[64] = "Arctic Ice Works";
+    guildNames[65] = "Storm Cloud Brewing";
+    guildNames[66] = "Calm Waters Fishing";
+    guildNames[67] = "Wild Horse Stables";
+    guildNames[68] = "Gentle Lamb Wool";
+    guildNames[69] = "Fierce Lion Security";
+    guildNames[70] = "Swift Eagle Couriers";
+    guildNames[71] = "Wise Owl Libraries";
+    guildNames[72] = "Busy Bee Honey";
+    guildNames[73] = "Sleepy Cat Inns";
+    guildNames[74] = "Loyal Dog Guards";
+    guildNames[75] = "Noble Hart Hunting";
+    guildNames[76] = "Clever Fox Trading";
+    guildNames[77] = "Strong Bear Logging";
+    guildNames[78] = "Quick Rabbit Delivery";
+    guildNames[79] = "Proud Peacock Fashion";
+    guildNames[80] = "Brave Wolf Pack";
+    guildNames[81] = "Free Bird Airways";
+    guildNames[82] = "Deep Root Farming";
+    guildNames[83] = "Bright Star Navigation";
+    guildNames[84] = "Dark Moon Mysteries";
+    guildNames[85] = "Fresh Spring Water";
+    guildNames[86] = "Ancient Oak Furniture";
+    guildNames[87] = "New Dawn Industries";
+    guildNames[88] = "Old Mill Grain";
+    guildNames[89] = "Young Sprout Gardens";
+    guildNames[90] = "Elder Sage Consulting";
+    guildNames[91] = "Master Craft Tools";
+    guildNames[92] = "Apprentice Learn Co";
+    guildNames[93] = "Journey's End Inns";
+    guildNames[94] = "Adventure Gear Ltd";
+    guildNames[95] = "Castle Wall Defense";
+    guildNames[96] = "Tower Bridge Engineering";
+    guildNames[97] = "Gate Keep Security";
+    guildNames[98] = "Moat Water Management";
+    guildNames[99] = "Drawbridge Mechanics";
+    guildNames[100] = "Crown Jewel Mining";
+    guildNames[101] = "Royal Court Services";
+    guildNames[102] = "Noble House Estates";
+    guildNames[103] = "Peasant Market Goods";
+    guildNames[104] = "Knight Armor Works";
+    guildNames[105] = "Merchant Guild Alliance";
+    guildNames[106] = "Artisan Craft Union";
+    guildNames[107] = "Farmer Harvest Co-op";
+    guildNames[108] = "Fisher Net Collective";
+    guildNames[109] = "Hunter Track Society";
+
     var stocks = [];
     var stockIndex = 0;
-    var volatilities = ['Low', 'Medium', 'High'];
     for (var i = 0; i < guildNames.length; i++) {
       var tempGuildName = guildNames[i];
       var tempStock = {};
@@ -249,465 +515,1200 @@
       randomPrice = randomPrice + 10;
       tempStock.price = Math.floor(randomPrice);
       tempStock.change = 0;
-      tempStock.history = [tempStock.price];
-      tempStock.volatility = volatilities[Math.floor(Math.random() * 3)];
       stocks[stockIndex] = tempStock;
       stockIndex = stockIndex + 1;
     }
+
+    function getEl(elementId) {
+      var foundElement = document.getElementById(elementId);
+      return foundElement;
+    }
+
+    function setText(elementToChange, newText) {
+      if (elementToChange) {
+        elementToChange.textContent = newText;
+      }
+    }
+
+    function showPopup(messageToShow) {
+      if (allowAlerts == false) {
+        return;
+      }
+      var existingPopup = document.querySelector('.medieval-popup');
+      if (existingPopup) {
+        existingPopup.remove();
+      }
+      var newPopup = document.createElement('div');
+      newPopup.className = 'medieval-popup';
+      var uniqueHideId = 'hideAlerts' + Date.now();
+      var popupHtml = '';
+      popupHtml = popupHtml + '<div>' + messageToShow + '</div>';
+      popupHtml = popupHtml + '<label style="display:flex;align-items:center;margin-top:10px;font-size:0.9rem;">';
+      popupHtml = popupHtml + '<input id="' + uniqueHideId + '" type="checkbox" style="margin-right:8px;">Do not show these alerts again';
+      popupHtml = popupHtml + '</label>';
+      popupHtml = popupHtml + '<div style="text-align:right;">';
+      popupHtml = popupHtml + '<button type="button" id="closePopup">Close</button>';
+      popupHtml = popupHtml + '</div>';
+      newPopup.innerHTML = popupHtml;
+      document.body.appendChild(newPopup);
+      var closeButton = newPopup.querySelector('#closePopup');
+      closeButton.addEventListener('click', function() {
+        var hideCheckbox = newPopup.querySelector('#' + uniqueHideId);
+        if (hideCheckbox && hideCheckbox.checked) {
+          allowAlerts = false;
+          localStorage.setItem('medievalBankPopups', 'false');
+          saveState();
+        }
+        newPopup.remove();
+      });
+    }
+
+    function logHistory(actionText, itemName, amountNumber, valueNumber) {
+      var currentTime = new Date().toLocaleTimeString();
+      var historyEntry = '';
+      if (itemName == 'Bank') {
+        historyEntry = currentTime + ' — ' + actionText + ': ' + Math.floor(valueNumber) + ' coins';
+      } else {
+        historyEntry = currentTime + ' — ' + actionText + ' ' + amountNumber + ' shares of ' + itemName + ' for ' + Math.floor(valueNumber) + ' coins';
+      }
+      tradeEntries.unshift(historyEntry);
+      if (tradeEntries.length > 200) {
+        tradeEntries.pop();
+      }
+      renderHistory();
+    }
+
+    function refreshAll() {
+      updateBalances();
+      updateCreditDisplay();
+      updateLoanDisplay();
+      renderPortfolio();
+      renderHistory();
+      updateTitle();
+    }
+
+    function updateBalances() {
+      var headerBalanceElement = getEl('headerGoldBalance');
+      if (headerBalanceElement) {
+        headerBalanceElement.textContent = Math.floor(gold);
+      }
+      var goldBalanceElement = getEl('goldBalance');
+      if (goldBalanceElement) {
+        goldBalanceElement.textContent = Math.floor(gold);
+      }
+    }
+
     function renderStocks() {
-      var stockTableBody = document.getElementById('stockBody');
+      var stockTableBody = getEl('stockBody');
+      if (stockTableBody == null) {
+        return;
+      }
       stockTableBody.innerHTML = '';
-      for (var i = 0; i < stocks.length; i++) {
+      for (var stockCounter = 0; stockCounter < stocks.length; stockCounter++) {
+        var currentStock = stocks[stockCounter];
         var newRow = document.createElement('tr');
         var nameCell = document.createElement('td');
-        nameCell.textContent = stocks[i].name;
+        nameCell.textContent = currentStock.name;
         var priceCell = document.createElement('td');
-        priceCell.textContent = stocks[i].price;
+        var priceString = currentStock.price.toFixed(2);
+        priceCell.textContent = priceString;
         var changeCell = document.createElement('td');
-        changeCell.textContent = stocks[i].change.toFixed(2);
-        if (stocks[i].change > 0) {
-          changeCell.className = 'positive';
-          changeCell.textContent = '+' + stocks[i].change.toFixed(2);
-        } else if (stocks[i].change < 0) {
-          changeCell.className = 'negative';
+        var changeSign = '';
+        if (currentStock.change >= 0) {
+          changeSign = '+';
         }
-        var volatilityCell = document.createElement('td');
-        volatilityCell.textContent = stocks[i].volatility;
+        var changeString = changeSign + currentStock.change.toFixed(2);
+        changeCell.textContent = changeString;
+        if (currentStock.change >= 0) {
+          changeCell.style.color = 'green';
+        } else {
+          changeCell.style.color = 'red';
+        }
         newRow.appendChild(nameCell);
         newRow.appendChild(priceCell);
         newRow.appendChild(changeCell);
-        newRow.appendChild(volatilityCell);
         stockTableBody.appendChild(newRow);
       }
     }
+
     function updateStocks() {
-      for (var i = 0; i < stocks.length; i++) {
-        var maxChange = 5;
-        if (stocks[i].volatility == 'Low') {
-          maxChange = 3;
-        } else if (stocks[i].volatility == 'Medium') {
-          maxChange = 5;
-        } else if (stocks[i].volatility == 'High') {
-          maxChange = 10;
+      for (var stockCounter = 0; stockCounter < stocks.length; stockCounter++) {
+        var currentStock = stocks[stockCounter];
+        var priceChange = (Math.random() - 0.5) * 5;
+        currentStock.change = priceChange;
+        var newStockPrice = currentStock.price + priceChange;
+        if (newStockPrice < 1) {
+          newStockPrice = 1;
         }
-        var priceChange = Math.random() * maxChange * 2 - maxChange;
-        stocks[i].change = priceChange;
-        var newPrice = stocks[i].price + priceChange;
-        if (newPrice < 1) {
-          newPrice = 1;
-        }
-        stocks[i].price = Math.floor(newPrice);
-        stocks[i].history.push(stocks[i].price);
-        if (stocks[i].history.length > 5) {
-          stocks[i].history.shift();
-        }
+        var roundedPrice = Number(newStockPrice.toFixed(2));
+        currentStock.price = roundedPrice;
       }
       renderStocks();
       renderPortfolio();
-      renderStockHistory();
+      updateTitle();
+      ensureDropdown();
     }
-    function calculatePortfolioValue() {
-      var totalValue = gold;
-      for (var guildName in portfolio) {
-        var stockFound = null;
-        for (var i = 0; i < stocks.length; i++) {
-          if (stocks[i].name == guildName) {
-            stockFound = stocks[i];
-            break;
-          }
-        }
-        if (stockFound != null && portfolio[guildName].shares > 0) {
-          totalValue = totalValue + (portfolio[guildName].shares * stockFound.price);
-        }
-      }
-      if (activeLoan != null) {
-        totalValue = totalValue - activeLoan.totalRepayment;
-      }
-      return Math.floor(totalValue);
-    }
-    function renderPortfolio() {
-      var portfolioBody = document.getElementById('portfolioBody');
-      portfolioBody.innerHTML = '';
-      for (var guildName in portfolio) {
-        var stockFound = null;
-        for (var i = 0; i < stocks.length; i++) {
-          if (stocks[i].name == guildName) {
-            stockFound = stocks[i];
-            break;
-          }
-        }
-        if (stockFound != null && portfolio[guildName].shares > 0) {
-          var newRow = document.createElement('tr');
-          var nameCell = document.createElement('td');
-          nameCell.textContent = guildName;
-          var sharesCell = document.createElement('td');
-          sharesCell.textContent = portfolio[guildName].shares;
-          var avgPriceCell = document.createElement('td');
-          avgPriceCell.textContent = portfolio[guildName].avgBuyPrice.toFixed(2);
-          var currentPriceCell = document.createElement('td');
-          currentPriceCell.textContent = stockFound.price;
-          newRow.appendChild(nameCell);
-          newRow.appendChild(sharesCell);
-          newRow.appendChild(avgPriceCell);
-          newRow.appendChild(currentPriceCell);
-          portfolioBody.appendChild(newRow);
-        }
-      }
-      var goldBalanceElement = document.getElementById('goldBalance');
-      goldBalanceElement.textContent = Math.floor(gold);
-      var headerBalanceElement = document.getElementById('headerGoldBalance');
-      headerBalanceElement.textContent = Math.floor(gold);
-      var portfolioValueElement = document.getElementById('portfolioValue');
-      var portfolioValue = calculatePortfolioValue();
-      portfolioValueElement.textContent = portfolioValue;
-      var creditUsedElement = document.getElementById('creditUsed');
-      creditUsedElement.textContent = Math.floor(creditUsed);
-      var creditLimitElement = document.getElementById('creditLimit');
-      creditLimitElement.textContent = Math.floor(creditLimit);
-      var loanBalanceElement = document.getElementById('loanBalance');
-      if (activeLoan != null) {
-        loanBalanceElement.textContent = activeLoan.totalRepayment.toFixed(2);
-      } else {
-        loanBalanceElement.textContent = '0';
-      }
-      var performanceElement = document.getElementById('portfolioPerformance');
-      var performance = portfolioValue - initialInvestment;
-      if (performance > 0) {
-        performanceElement.className = 'positive';
-        performanceElement.textContent = '+' + performance.toFixed(2);
-      } else {
-        performanceElement.className = 'negative';
-        performanceElement.textContent = performance.toFixed(2);
-      }
-    }
-    function resetPortfolio() {
-      gold = 100;
-      initialInvestment = 100;
-      portfolio = {};
-      transactionHistory = [];
-      activeLoan = null;
-      creditLimit = 0;
-      creditUsed = 0;
-      renderPortfolio();
-      renderTransactionHistory();
-    }
-    function repayLoan() {
-      var outputBox = document.getElementById('output');
-      if (activeLoan == null) {
-        outputBox.textContent = 'No active loan to repay.';
+
+    function ensureDropdown() {
+      var stockDropdown = getEl('selectedStock');
+      if (stockDropdown == null) {
         return;
       }
-      var payment = activeLoan.monthlyPayment;
-      if (gold < payment) {
-        outputBox.textContent = 'Not enough gold to make loan payment of ' + payment.toFixed(2) + ' gold.';
-        return;
+      if (stockDropdown.options.length == 0) {
+        populateDropdown();
       }
-      gold = gold - payment;
-      activeLoan.totalRepayment = activeLoan.totalRepayment - payment;
-      activeLoan.months = activeLoan.months - 1;
-      if (activeLoan.months <= 0 || activeLoan.totalRepayment <= 0) {
-        outputBox.textContent = 'Loan fully repaid!';
-        activeLoan = null;
-      } else {
-        outputBox.textContent = 'Loan payment of ' + payment.toFixed(2) + ' gold made. ' + activeLoan.months + ' months remaining.';
-      }
-      renderPortfolio();
     }
-    function repayCredit() {
-      var outputBox = document.getElementById('output');
-      if (creditUsed == 0) {
-        outputBox.textContent = 'No credit used to repay.';
+
+    function populateDropdown() {
+      var stockDropdown = getEl('selectedStock');
+      if (stockDropdown == null) {
         return;
       }
-      var repaymentAmount = creditUsed;
-      if (gold < repaymentAmount) {
-        outputBox.textContent = 'Not enough gold to repay ' + repaymentAmount.toFixed(2) + ' gold of credit.';
-        return;
-      }
-      gold = gold - repaymentAmount;
-      creditUsed = 0;
-      outputBox.textContent = 'Credit of ' + repaymentAmount.toFixed(2) + ' gold fully repaid.';
-      renderPortfolio();
-    }
-    function populateStockDropdown() {
-      var stockDropdown = document.getElementById('selectedStock');
-      var historyDropdown = document.getElementById('historyStock');
       stockDropdown.innerHTML = '';
-      historyDropdown.innerHTML = '';
       var defaultOption = document.createElement('option');
       defaultOption.value = '';
-      defaultOption.textContent = 'Select a Guild...';
+      defaultOption.textContent = 'Select Guild...';
       defaultOption.disabled = true;
       defaultOption.selected = true;
       stockDropdown.appendChild(defaultOption);
-      var historyDefault = defaultOption.cloneNode(true);
-      historyDropdown.appendChild(historyDefault);
-      for (var i = 0; i < stocks.length; i++) {
+      for (var stockCounter = 0; stockCounter < stocks.length; stockCounter++) {
         var newOption = document.createElement('option');
-        newOption.value = stocks[i].name;
-        newOption.textContent = stocks[i].name;
+        newOption.value = stocks[stockCounter].name;
+        newOption.textContent = stocks[stockCounter].name;
         stockDropdown.appendChild(newOption);
-        historyDropdown.appendChild(newOption.cloneNode(true));
       }
     }
-    function renderStockHistory() {
-      var selectedStock = document.getElementById('historyStock').value;
-      var historyBody = document.getElementById('historyBody');
-      historyBody.innerHTML = '';
-      if (!selectedStock) {
+
+    function renderPortfolio() {
+      var portfolioTableBody = getEl('portfolioBody');
+      if (portfolioTableBody == null) {
         return;
       }
-      var stockFound = null;
-      for (var i = 0; i < stocks.length; i++) {
-        if (stocks[i].name == selectedStock) {
-          stockFound = stocks[i];
-          break;
+      portfolioTableBody.innerHTML = '';
+      for (var stockName in portfolio) {
+        var stockHolding = portfolio[stockName];
+        if (stockHolding == null || stockHolding.shares <= 0) {
+          continue;
         }
-      }
-      if (stockFound != null) {
-        for (var j = stockFound.history.length - 1; j >= 0; j--) {
-          var newRow = document.createElement('tr');
-          var updateCell = document.createElement('td');
-          updateCell.textContent = 'Update ' + (stockFound.history.length - j);
-          var priceCell = document.createElement('td');
-          priceCell.textContent = stockFound.history[j];
-          newRow.appendChild(updateCell);
-          newRow.appendChild(priceCell);
-          historyBody.appendChild(newRow);
+        var currentStock = null;
+        for (var stockCounter = 0; stockCounter < stocks.length; stockCounter++) {
+          if (stocks[stockCounter].name == stockName) {
+            currentStock = stocks[stockCounter];
+            break;
+          }
         }
-      }
-    }
-    function renderTransactionHistory() {
-      var transactionBody = document.getElementById('transactionBody');
-      transactionBody.innerHTML = '';
-      for (var i = transactionHistory.length - 1; i >= 0; i--) {
-        var transaction = transactionHistory[i];
+        if (currentStock == null) {
+          continue;
+        }
         var newRow = document.createElement('tr');
-        var typeCell = document.createElement('td');
-        typeCell.textContent = transaction.type;
-        var guildCell = document.createElement('td');
-        guildCell.textContent = transaction.guild;
+        var nameCell = document.createElement('td');
+        nameCell.textContent = stockName;
         var sharesCell = document.createElement('td');
-        sharesCell.textContent = transaction.shares;
-        var priceCell = document.createElement('td');
-        priceCell.textContent = transaction.price;
-        var totalCell = document.createElement('td');
-        totalCell.textContent = transaction.total;
-        newRow.appendChild(typeCell);
-        newRow.appendChild(guildCell);
+        sharesCell.textContent = stockHolding.shares;
+        var avgPriceCell = document.createElement('td');
+        avgPriceCell.textContent = Math.floor(stockHolding.avgBuyPrice);
+        var currentPriceCell = document.createElement('td');
+        currentPriceCell.textContent = Math.floor(currentStock.price);
+        var totalValue = Math.floor(stockHolding.shares * currentStock.price);
+        var valueCell = document.createElement('td');
+        valueCell.textContent = totalValue;
+        var profitLoss = Math.floor((currentStock.price - stockHolding.avgBuyPrice) * stockHolding.shares);
+        var profitCell = document.createElement('td');
+        profitCell.textContent = profitLoss;
+        if (profitLoss >= 0) {
+          profitCell.style.color = 'green';
+        } else {
+          profitCell.style.color = 'red';
+        }
+        var sellCell = document.createElement('td');
+        var sellButton = document.createElement('button');
+        sellButton.textContent = 'Sell All';
+        sellButton.onclick = function() {
+          sellAllStock(stockName);
+        };
+        sellCell.appendChild(sellButton);
+        var buyCell = document.createElement('td');
+        var buyButton = document.createElement('button');
+        buyButton.textContent = 'Buy 1';
+        buyButton.onclick = function() {
+          buySingleShare(stockName);
+        };
+        buyCell.appendChild(buyButton);
+        newRow.appendChild(nameCell);
         newRow.appendChild(sharesCell);
-        newRow.appendChild(priceCell);
-        newRow.appendChild(totalCell);
-        transactionBody.appendChild(newRow);
+        newRow.appendChild(avgPriceCell);
+        newRow.appendChild(currentPriceCell);
+        newRow.appendChild(valueCell);
+        newRow.appendChild(profitCell);
+        newRow.appendChild(sellCell);
+        newRow.appendChild(buyCell);
+        portfolioTableBody.appendChild(newRow);
       }
     }
-    function executeTrade() {
-      var selectedStock = document.getElementById('selectedStock').value;
-      var tradeType = document.getElementById('tradeType').value;
-      var tradeAmount = document.getElementById('tradeAmount').value;
-      var tradeResult = document.getElementById('tradeResult');
-      tradeAmount = parseInt(tradeAmount);
-      if (!selectedStock) {
-        tradeResult.textContent = 'Please select a Guild to trade.';
+
+    function renderHistory() {
+      var historyList = getEl('tradeHistory');
+      if (historyList == null) {
         return;
       }
-      if (isNaN(tradeAmount) || tradeAmount <= 0) {
-        tradeResult.textContent = 'Enter a valid number of shares.';
-        return;
+      historyList.innerHTML = '';
+      var maxEntries = 50;
+      if (tradeEntries.length < 50) {
+        maxEntries = tradeEntries.length;
       }
-      var stockFound = null;
-      for (var i = 0; i < stocks.length; i++) {
-        if (stocks[i].name == selectedStock) {
-          stockFound = stocks[i];
+      for (var entryCounter = 0; entryCounter < maxEntries; entryCounter++) {
+        var listItem = document.createElement('li');
+        listItem.textContent = tradeEntries[entryCounter];
+        historyList.appendChild(listItem);
+      }
+    }
+
+    function sellAllStock(name) {
+      var holding = portfolio[name];
+      var stock = null;
+      for (var index = 0; index < stocks.length; index++) {
+        if (stocks[index].name == name) {
+          stock = stocks[index];
           break;
         }
       }
-      if (stockFound == null) {
-        tradeResult.textContent = 'Guild not found.';
+      if (!holding || !stock || holding.shares <= 0) {
         return;
       }
+      var value = Math.floor(holding.shares * stock.price);
+      gold = gold + value;
+      logHistory('Sold', name, holding.shares, value);
+      holding.shares = 0;
+      refreshAll();
+    }
+
+    function buySingleShare(name) {
+      var stock = null;
+      for (var index = 0; index < stocks.length; index++) {
+        if (stocks[index].name == name) {
+          stock = stocks[index];
+          break;
+        }
+      }
+      if (!stock) {
+        return;
+      }
+      var cost = Math.floor(stock.price);
+      var availableCredit = 0;
+      if (creditLimit > creditBalance) {
+        availableCredit = creditLimit - creditBalance;
+      }
+      var canUseGold = false;
+      if (gold - cost >= -50) {
+        canUseGold = true;
+      }
+      var canUseCredit = false;
+      if (availableCredit >= cost) {
+        canUseCredit = true;
+      }
+      var useCredit = false;
+      if (creditLimit > 0 && canUseCredit) {
+        if (canUseGold == false) {
+          useCredit = true;
+        } else {
+          var userChoice = confirm('Use credit for this purchase? (OK = Credit, Cancel = Gold)');
+          if (userChoice) {
+            useCredit = true;
+          }
+        }
+      }
+      if (useCredit == false && canUseGold == false) {
+        showPopup('🚫 Not enough gold to purchase.');
+        return;
+      }
+      if (useCredit) {
+        creditBalance = creditBalance + cost;
+        logHistory('Bought (Credit)', name, 1, cost);
+      } else {
+        gold = gold - cost;
+        logHistory('Bought', name, 1, cost);
+      }
+      if (!portfolio[name]) {
+        portfolio[name] = {};
+        portfolio[name].shares = 0;
+        portfolio[name].avgBuyPrice = 0;
+      }
+      var holding = portfolio[name];
+      var newTotalShares = holding.shares + 1;
+      var totalSpent = (holding.avgBuyPrice * holding.shares) + stock.price;
+      holding.avgBuyPrice = totalSpent / newTotalShares;
+      holding.shares = newTotalShares;
+      refreshAll();
+    }
+
+    function executeTrade() {
+      var stockName = getEl('selectedStock').value;
+      var stock = null;
+      for (var i = 0; i < stocks.length; i++) {
+        if (stocks[i].name == stockName) {
+          stock = stocks[i];
+          break;
+        }
+      }
+      var tradeType = getEl('tradeType').value;
+      var tradeAmount = parseInt(getEl('tradeAmount').value);
+      if (isNaN(tradeAmount)) {
+        tradeAmount = 0;
+      }
+      var resultBox = getEl('tradeResult');
+      if (!stock || tradeAmount <= 0) {
+        if (resultBox) {
+          resultBox.textContent = 'Pick a guild and a valid number of shares.';
+        }
+        return;
+      }
+      var totalCost = Math.floor(stock.price * tradeAmount);
       if (tradeType == 'buy') {
-        var totalCost = stockFound.price * tradeAmount;
-        var availableCredit = creditLimit - creditUsed;
-        if (totalCost > (gold + availableCredit)) {
-          tradeResult.textContent = 'Not enough gold or credit to buy ' + tradeAmount + ' shares of ' + selectedStock + '.';
+        var paymentMethod = getEl('paymentMethod').value;
+        var goldEnough = false;
+        if (gold - totalCost >= -50) {
+          goldEnough = true;
+        }
+        var creditLeft = 0;
+        if (creditLimit > creditBalance) {
+          creditLeft = creditLimit - creditBalance;
+        }
+        var creditEnough = false;
+        if (creditLeft >= totalCost) {
+          creditEnough = true;
+        }
+        if (paymentMethod == 'gold' && goldEnough == false) {
+          if (resultBox) {
+            resultBox.textContent = 'Not enough gold! Cannot go below -50 coins.';
+          }
+          showPopup('🚫 Purchase Denied! Cannot go below 50 coin debt!');
           return;
         }
-        if (totalCost > gold) {
-          var creditNeeded = totalCost - gold;
-          creditUsed = creditUsed + creditNeeded;
-          gold = 0;
+        if (paymentMethod == 'credit' && creditEnough == false) {
+          if (resultBox) {
+            resultBox.textContent = 'Not enough credit available.';
+          }
+          return;
+        }
+        if (paymentMethod == 'credit') {
+          creditBalance = creditBalance + totalCost;
+          logHistory('Bought (Credit)', stockName, tradeAmount, totalCost);
+          if (resultBox) {
+            resultBox.textContent = 'Thou bought ' + tradeAmount + ' shares of ' + stockName + ' with credit.';
+          }
         } else {
           gold = gold - totalCost;
+          logHistory('Bought', stockName, tradeAmount, totalCost);
+          if (resultBox) {
+            resultBox.textContent = 'Thou bought ' + tradeAmount + ' shares of ' + stockName + '.';
+          }
         }
-        if (portfolio[selectedStock] == undefined) {
-          portfolio[selectedStock] = { shares: 0, avgBuyPrice: 0 };
+        if (!portfolio[stockName]) {
+          portfolio[stockName] = {};
+          portfolio[stockName].shares = 0;
+          portfolio[stockName].avgBuyPrice = 0;
         }
-        var currentShares = portfolio[selectedStock].shares;
-        var currentAvgPrice = portfolio[selectedStock].avgBuyPrice;
-        var newShares = currentShares + tradeAmount;
-        var newAvgPrice = ((currentAvgPrice * currentShares) + (stockFound.price * tradeAmount)) / newShares;
-        portfolio[selectedStock].shares = newShares;
-        portfolio[selectedStock].avgBuyPrice = newAvgPrice;
-        transactionHistory.push({
-          type: 'Buy',
-          guild: selectedStock,
-          shares: tradeAmount,
-          price: stockFound.price,
-          total: totalCost
-        });
-        tradeResult.textContent = 'Bought ' + tradeAmount + ' shares of ' + selectedStock + ' for ' + totalCost + ' gold.';
-      } else if (tradeType == 'sell') {
-        if (portfolio[selectedStock] == undefined || portfolio[selectedStock].shares < tradeAmount) {
-          tradeResult.textContent = 'Not enough shares to sell ' + tradeAmount + ' of ' + selectedStock + '.';
+        var currentHolding = portfolio[stockName];
+        var newShares = currentHolding.shares + tradeAmount;
+        var totalSpent = (currentHolding.avgBuyPrice * currentHolding.shares) + (stock.price * tradeAmount);
+        currentHolding.avgBuyPrice = totalSpent / newShares;
+        currentHolding.shares = newShares;
+      } else {
+        if (!portfolio[stockName] || portfolio[stockName].shares < tradeAmount) {
+          if (resultBox) {
+            resultBox.textContent = 'Not enough shares to sell.';
+          }
           return;
         }
-        var totalSale = stockFound.price * tradeAmount;
-        gold = gold + totalSale;
-        portfolio[selectedStock].shares = portfolio[selectedStock].shares - tradeAmount;
-        transactionHistory.push({
-          type: 'Sell',
-          guild: selectedStock,
-          shares: tradeAmount,
-          price: stockFound.price,
-          total: totalSale
-        });
-        tradeResult.textContent = 'Sold ' + tradeAmount + ' shares of ' + selectedStock + ' for ' + totalSale + ' gold.';
-        if (portfolio[selectedStock].shares == 0) {
-          delete portfolio[selectedStock];
+        portfolio[stockName].shares = portfolio[stockName].shares - tradeAmount;
+        gold = gold + totalCost;
+        logHistory('Sold', stockName, tradeAmount, totalCost);
+        if (resultBox) {
+          resultBox.textContent = 'Thou sold ' + tradeAmount + ' shares of ' + stockName + '.';
         }
       }
-      renderPortfolio();
-      renderTransactionHistory();
+      refreshAll();
     }
-    var creditDropdown = document.getElementById('credit');
-    creditDropdown.onchange = function() {
-      var creditSection = document.getElementById('creditLimitSection');
-      var loanSection = document.getElementById('loanAmountSection');
-      if (creditDropdown.value == 'credit') {
-        creditSection.style.display = 'block';
-        loanSection.style.display = 'none';
-      } else if (creditDropdown.value == 'loan') {
-        creditSection.style.display = 'none';
-        loanSection.style.display = 'block';
+
+    function handleTradePreview() {
+      var stockName = getEl('selectedStock').value;
+      var stock = null;
+      for (var i = 0; i < stocks.length; i++) {
+        if (stocks[i].name == stockName) {
+          stock = stocks[i];
+          break;
+        }
+      }
+      var amount = parseInt(getEl('tradeAmount').value);
+      if (isNaN(amount)) {
+        amount = 0;
+      }
+      var resultBox = getEl('tradeResult');
+      if (!stock || amount <= 0) {
+        if (resultBox) {
+          resultBox.textContent = '';
+        }
+        return;
+      }
+      if (resultBox) {
+        resultBox.textContent = 'Cost for ' + amount + ' shares: ' + Math.floor(stock.price * amount) + ' coins';
+      }
+    }
+
+    function handleBankRequest() {
+      var userName = getEl('name').value;
+      if (userName) {
+        userName = userName.trim();
       } else {
-        creditSection.style.display = 'none';
-        loanSection.style.display = 'none';
+        userName = '';
       }
-    };
-    var resetButton = document.getElementById('resetBank');
-    resetButton.onclick = function() {
-      var nameInput = document.getElementById('name');
-      nameInput.value = '';
-      var creditInput = document.getElementById('credit');
-      creditInput.value = '';
-      var limitInput = document.getElementById('limit');
-      limitInput.value = '';
-      var loanInput = document.getElementById('loan');
-      loanInput.value = '';
-      var scoreInput = document.getElementById('score');
-      scoreInput.value = '';
-      var monthsInput = document.getElementById('months');
-      monthsInput.value = '';
-      var creditSection = document.getElementById('creditLimitSection');
-      creditSection.style.display = 'none';
-      var loanSection = document.getElementById('loanAmountSection');
-      loanSection.style.display = 'none';
-      var outputBox = document.getElementById('output');
-      outputBox.textContent = '';
-    };
-    var submitButton = document.getElementById('submitBank');
-    submitButton.onclick = function() {
-      var userName = document.getElementById('name').value;
-      var creditOrLoan = document.getElementById('credit').value;
-      var loanAmount = parseInt(document.getElementById('loan').value);
-      var creditLimitRequested = parseInt(document.getElementById('limit').value);
-      var creditScore = parseInt(document.getElementById('score').value);
-      var months = parseInt(document.getElementById('months').value);
-      var outputBox = document.getElementById('output');
-      if (!userName || !creditOrLoan || isNaN(creditScore) || isNaN(months)) {
-        outputBox.textContent = 'Please complete all fields.';
+      var creditOrLoan = getEl('credit').value;
+      var creditLimitInput = parseFloat(getEl('limit').value);
+      if (isNaN(creditLimitInput)) {
+        creditLimitInput = 0;
+      }
+      var loanInput = parseFloat(getEl('loan').value);
+      if (isNaN(loanInput)) {
+        loanInput = 0;
+      }
+      var creditScore = parseInt(getEl('score').value);
+      if (isNaN(creditScore)) {
+        creditScore = 0;
+      }
+      var repaymentMonths = parseInt(getEl('months').value);
+      if (isNaN(repaymentMonths) || repaymentMonths < 1) {
+        repaymentMonths = 1;
+      }
+      var outputMessage = '';
+      var outputBox = getEl('output');
+      if (!creditOrLoan) {
+        if (outputBox) {
+          outputBox.textContent = 'Pick Credit or Loan to continue.';
+        }
         return;
       }
-      if (creditScore < 300 || creditScore > 850) {
-        outputBox.textContent = 'Credit score must be between 300 and 850.';
-        return;
-      }
-      if (months < 1) {
-        outputBox.textContent = 'Repayment period must be at least 1 month.';
-        return;
+      outputMessage = 'Let us handle thy banking needs.\n\n';
+      if (creditOrLoan == 'credit') {
+        var creditApproved = false;
+        if (creditScore >= 500 || Math.random() > 0.5) {
+          creditApproved = true;
+        }
+        if (creditApproved == false) {
+          outputMessage = outputMessage + 'Sorry, thy credit request is denied due to low score.\n';
+          showPopup('❌ Credit Denied! Score too low.');
+        } else if (creditLimitInput <= 0) {
+          outputMessage = outputMessage + 'Enter a credit limit greater than zero.\n';
+        } else {
+          var approvedLimit = creditLimitInput;
+          if (creditLimitInput > 50000) {
+            approvedLimit = 50000;
+            outputMessage = outputMessage + 'Credit limit capped at 50,000 coins.\n';
+          }
+          var interestRate = 0.30;
+          if (creditScore >= 750) {
+            interestRate = 0.18;
+          } else if (creditScore >= 700) {
+            interestRate = 0.21;
+          } else if (creditScore >= 650) {
+            interestRate = 0.24;
+          } else if (creditScore >= 600) {
+            interestRate = 0.27;
+          }
+          var monthlyFee = Math.ceil(approvedLimit * 0.01);
+          outputMessage = outputMessage + 'Credit approved for ' + Math.floor(approvedLimit) + ' coins.\n';
+          outputMessage = outputMessage + 'Credit card interest rate: ' + (interestRate * 100).toFixed(1) + '%\n';
+          outputMessage = outputMessage + 'Monthly fee: ' + monthlyFee + ' coins\n';
+          setCredit(approvedLimit, interestRate, monthlyFee);
+          showPopup('💳 Credit Approved! Limit: ' + Math.floor(approvedLimit) + ' coins');
+        }
       }
       if (creditOrLoan == 'loan') {
-        if (isNaN(loanAmount) || loanAmount <= 0) {
-          outputBox.textContent = 'Enter a valid loan amount.';
-          return;
+        if (loanInput <= 0) {
+          outputMessage = outputMessage + 'Enter a valid loan amount.\n';
+        } else {
+          outputMessage = outputMessage + 'Requested loan of ' + Math.floor(loanInput) + ' coins.\n';
+          if (creditScore < 300 || creditScore > 850) {
+            outputMessage = outputMessage + 'Credit score must be between 300 and 850.\n';
+          } else {
+            var loanApproved = false;
+            if (creditScore >= 600 || Math.random() > 0.2) {
+              loanApproved = true;
+            }
+            if (loanApproved == false) {
+              outputMessage = outputMessage + 'Sorry, loan denied due to low credit.\n';
+              showPopup('❌ Loan Denied! Low credit score.');
+            } else {
+              var loanRate = 0.07;
+              if (creditScore >= 750) {
+                loanRate = 0.03;
+              } else if (creditScore >= 700) {
+                loanRate = 0.04;
+              } else if (creditScore >= 650) {
+                loanRate = 0.05;
+              } else if (creditScore >= 600) {
+                loanRate = 0.06;
+              }
+              var monthlyRate = loanRate / 12;
+              var monthlyPayment = Math.ceil(loanInput * monthlyRate / (1 - Math.pow(1 + monthlyRate, -repaymentMonths)));
+              var totalRepay = monthlyPayment * repaymentMonths;
+              var totalDebt = 0;
+              for (var i = 0; i < loans.length; i++) {
+                totalDebt = totalDebt + (loans[i].monthlyPayment * loans[i].months);
+              }
+              if (totalDebt + totalRepay > 1000000000) {
+                outputMessage = outputMessage + 'Loan denied! Total debt would exceed 1 billion coins.\n';
+              } else {
+                outputMessage = outputMessage + 'Loan approved!\n';
+                outputMessage = outputMessage + 'Interest rate: ' + (loanRate * 100).toFixed(1) + '%.\n';
+                outputMessage = outputMessage + 'Monthly payment: ' + monthlyPayment + ' coins for ' + repaymentMonths + ' moons.\n';
+                outputMessage = outputMessage + 'Total repay: ' + totalRepay + ' coins over ' + repaymentMonths + ' moons.\n';
+                createLoan(loanInput, repaymentMonths, monthlyPayment);
+                showPopup('✅ Loan Approved! Amount: ' + Math.floor(loanInput) + ' coins');
+              }
+            }
+          }
         }
-        if (activeLoan != null) {
-          outputBox.textContent = 'Thou already hast an active loan.';
-          return;
-        }
-        var maxLoan = creditScore * 100;
-        if (loanAmount > maxLoan) {
-          outputBox.textContent = 'Loan amount exceeds thy creditworthiness of ' + maxLoan + ' gold.';
-          return;
-        }
-        var interestRate = 0.1;
-        if (creditScore >= 700) {
-          interestRate = 0.05;
-        } else if (creditScore >= 500) {
-          interestRate = 0.08;
-        }
-        var totalInterest = loanAmount * interestRate * months;
-        var totalRepayment = loanAmount + totalInterest;
-        var monthlyPayment = totalRepayment / months;
-        activeLoan = {
-          amount: loanAmount,
-          interestRate: interestRate,
-          totalRepayment: totalRepayment,
-          months: months,
-          monthlyPayment: monthlyPayment
-        };
-        gold = gold + loanAmount;
-        initialInvestment = initialInvestment + loanAmount;
-        var message = 'Loan approved for ' + userName + '!\n';
-        message = message + 'Amount: ' + loanAmount + ' gold\n';
-        message = message + 'Interest Rate: ' + (interestRate * 100) + '%\n';
-        message = message + 'Total Repayment: ' + totalRepayment.toFixed(2) + ' gold\n';
-        message = message + 'Monthly Payment: ' + monthlyPayment.toFixed(2) + ' gold over ' + months + ' months\n';
-        outputBox.textContent = message;
-        renderPortfolio();
-      } else if (creditOrLoan == 'credit') {
-        if (isNaN(creditLimitRequested) || creditLimitRequested <= 0) {
-          outputBox.textContent = 'Enter a valid credit limit.';
-          return;
-        }
-        var maxCredit = creditScore * 50;
-        if (creditLimitRequested > maxCredit) {
-          outputBox.textContent = 'Requested credit limit exceeds thy creditworthiness of ' + maxCredit + ' gold.';
-          return;
-        }
-        creditLimit = creditLimitRequested;
-        var message = 'Credit line approved for ' + userName + '!\n';
-        message = message + 'Credit Limit: ' + creditLimit + ' gold\n';
-        outputBox.textContent = message;
-        renderPortfolio();
       }
-    };
-    var tradeButton = document.getElementById('executeTrade');
-    tradeButton.onclick = executeTrade;
-    var resetPortfolioButton = document.getElementById('resetPortfolio');
-    resetPortfolioButton.onclick = resetPortfolio;
-    var repayLoanButton = document.getElementById('repayLoan');
-    repayLoanButton.onclick = repayLoan;
-    var repayCreditButton = document.getElementById('repayCredit');
-    repayCreditButton.onclick = repayCredit;
+      if (creditScore >= 300 && creditScore <= 850) {
+        if (creditScore >= 750) {
+          outputMessage = outputMessage + 'Thy credit is excellent. Best rates for thee.\n';
+        } else if (creditScore >= 700) {
+          outputMessage = outputMessage + 'Thy credit is good. Good rates apply.\n';
+        } else if (creditScore >= 650) {
+          outputMessage = outputMessage + 'Thy credit is fair. Normal rates apply.\n';
+        } else if (creditScore >= 600) {
+          outputMessage = outputMessage + 'Thy credit is poor. Higher rates apply.\n';
+        } else {
+          outputMessage = outputMessage + 'Thy credit is very poor. High rates apply.\n';
+        }
+        outputMessage = outputMessage + 'Thy score is ' + creditScore + ' out of 850.\n';
+      }
+      if (repaymentMonths > 0) {
+        if (repaymentMonths < 12) {
+          outputMessage = outputMessage + 'Short-term loan of ' + repaymentMonths + ' moons.\n';
+        } else if (repaymentMonths <= 60) {
+          outputMessage = outputMessage + 'Medium-term loan of ' + repaymentMonths + ' moons.\n';
+        } else {
+          outputMessage = outputMessage + 'Long-term loan of ' + repaymentMonths + ' moons.\n';
+        }
+        outputMessage = outputMessage + '(Each moon is 1 minute.)\n';
+      }
+      if (userName) {
+        var firstLetter = userName.charAt(0).toUpperCase();
+        var restOfName = userName.slice(1);
+        outputMessage = outputMessage + '\nFare thee well, ' + firstLetter + restOfName + '. Visit Olde Goldvault again.\n';
+      } else {
+        outputMessage = outputMessage + '\nFare thee well, traveler. Visit Olde Goldvault again.\n';
+      }
+      if (outputBox) {
+        outputBox.textContent = outputMessage;
+      }
+      refreshAll();
+    }
+
+    function setCredit(limit, rate, fee) {
+      if (creditLimit == 0 && limit > 0) {
+        gold = gold + Math.floor(limit);
+        logHistory('Credit Line Approved', 'Bank', 1, limit);
+      } else if (limit > creditLimit) {
+        var extraCredit = limit - creditLimit;
+        gold = gold + Math.floor(extraCredit);
+        logHistory('Credit Increase', 'Bank', 1, extraCredit);
+      }
+      if (limit > creditLimit) {
+        creditLimit = limit;
+      } else {
+        creditLimit = creditLimit;
+      }
+      if (creditAnnualRate == 0) {
+        creditAnnualRate = rate;
+      } else if (rate < creditAnnualRate) {
+        creditAnnualRate = rate;
+      }
+      if (fee > creditMonthlyFee) {
+        creditMonthlyFee = fee;
+      }
+      refreshAll();
+    }
+
+    function createLoan(amount, months, monthlyPayment) {
+      var newLoan = {};
+      newLoan.id = Date.now() + Math.random();
+      newLoan.amount = amount;
+      newLoan.months = months;
+      newLoan.monthlyPayment = monthlyPayment;
+      loans.push(newLoan);
+      gold = gold + Math.floor(amount);
+      logHistory('Loan Received', 'Bank', 1, amount);
+      refreshAll();
+    }
+
+    function updateLoanDisplay() {
+      var loanBox = getEl('loanContainer');
+      if (!loanBox) {
+        return;
+      }
+      loanBox.innerHTML = '';
+      if (loans.length == 0) {
+        var noLoans = document.createElement('p');
+        noLoans.style.color = '#555';
+        noLoans.style.fontStyle = 'italic';
+        noLoans.textContent = 'No active loans';
+        loanBox.appendChild(noLoans);
+        return;
+      }
+      for (var i = 0; i < loans.length; i++) {
+        var currentLoan = loans[i];
+        var loanDiv = document.createElement('div');
+        loanDiv.className = 'loan-box';
+        var loanInfo = '<h4>Loan #' + (i + 1) + '</h4>';
+        loanInfo = loanInfo + '<div>Remaining Amount: ' + Math.floor(currentLoan.monthlyPayment * currentLoan.months) + ' coins</div>';
+        loanInfo = loanInfo + '<div>Monthly Payment: ' + Math.floor(currentLoan.monthlyPayment) + ' coins</div>';
+        loanInfo = loanInfo + '<div>Months Left: ' + currentLoan.months + '</div>';
+        loanDiv.innerHTML = loanInfo;
+        var payButton = document.createElement('button');
+        payButton.textContent = 'Pay Off Loan';
+        payButton.onclick = function() {
+          payOffLoan(currentLoan.id);
+        };
+        loanDiv.appendChild(payButton);
+        loanBox.appendChild(loanDiv);
+      }
+    }
+
+    function updateCreditDisplay() {
+      var creditAvailable = 0;
+      if (creditLimit > creditBalance) {
+        creditAvailable = creditLimit - creditBalance;
+      }
+      var availableDisplay1 = getEl('availableCredit');
+      if (availableDisplay1) {
+        availableDisplay1.textContent = Math.floor(creditAvailable);
+      }
+      var availableDisplay2 = getEl('availableCreditDisplay');
+      if (availableDisplay2) {
+        availableDisplay2.textContent = Math.floor(creditAvailable);
+      }
+      var limitDisplay = getEl('creditLimitDisplay');
+      if (limitDisplay) {
+        limitDisplay.textContent = Math.floor(creditLimit);
+      }
+      var feeDisplay = getEl('creditFeeDisplay');
+      if (feeDisplay) {
+        feeDisplay.textContent = Math.floor(creditMonthlyFee);
+      }
+      var balanceDisplay = getEl('creditBalanceDisplay');
+      if (balanceDisplay) {
+        balanceDisplay.textContent = Math.floor(creditBalance);
+      }
+      var rateDisplay = getEl('creditRateDisplay');
+      if (rateDisplay) {
+        rateDisplay.textContent = (creditAnnualRate * 100).toFixed(1);
+      }
+      var creditSection = getEl('creditManagement');
+      var balanceSection = getEl('creditBalanceSection');
+      var cardSection = getEl('creditCardSection');
+      if (creditLimit > 0) {
+        if (creditSection) {
+          creditSection.style.display = 'block';
+        }
+        if (cardSection) {
+          cardSection.style.display = 'block';
+        }
+      } else {
+        if (creditSection) {
+          creditSection.style.display = 'none';
+        }
+        if (cardSection) {
+          cardSection.style.display = 'none';
+        }
+      }
+      if (creditBalance > 0) {
+        if (balanceSection) {
+          balanceSection.style.display = 'block';
+        }
+      } else {
+        if (balanceSection) {
+          balanceSection.style.display = 'none';
+        }
+      }
+      var paymentSection = getEl('paymentMethodSection');
+      if (paymentSection) {
+        var tradeType = getEl('tradeType').value;
+        if (tradeType == 'buy' && creditLimit > 0) {
+          paymentSection.style.display = 'block';
+        } else {
+          paymentSection.style.display = 'none';
+        }
+      }
+    }
+
+    function payOffLoan(id) {
+      var loanIndex = -1;
+      for (var i = 0; i < loans.length; i++) {
+        if (loans[i].id == id) {
+          loanIndex = i;
+          break;
+        }
+      }
+      if (loanIndex == -1) {
+        return;
+      }
+      var loan = loans[loanIndex];
+      var totalOwed = loan.monthlyPayment * loan.months;
+      if (gold >= totalOwed) {
+        gold = gold - Math.floor(totalOwed);
+        logHistory('Loan Paid Off', 'Bank', 1, -totalOwed);
+        var newLoans = [];
+        for (var i = 0; i < loans.length; i++) {
+          if (i != loanIndex) {
+            newLoans.push(loans[i]);
+          }
+        }
+        loans = newLoans;
+        showPopup('✅ Loan Paid Off! Amount paid: ' + Math.floor(totalOwed) + ' coins');
+        refreshAll();
+      } else {
+        showPopup('❌ Insufficient Funds! Need ' + Math.floor(totalOwed) + ' coins to pay off loan');
+      }
+    }
+
+    function cancelCreditLine() {
+      if (creditLimit <= 0) {
+        return;
+      }
+      if (creditBalance > 0) {
+        showPopup('❌ Cannot Cancel Credit! Pay off balance first: ' + Math.floor(creditBalance) + ' coins');
+        return;
+      }
+      var amountToRemove = creditLimit;
+      if (gold >= amountToRemove) {
+        gold = gold - Math.floor(amountToRemove);
+        creditLimit = 0;
+        creditAnnualRate = 0;
+        creditMonthlyFee = 0;
+        logHistory('Credit Line Cancelled', 'Bank', 1, -amountToRemove);
+        showPopup('✅ Credit Line Cancelled! Removed ' + Math.floor(amountToRemove) + ' coins');
+        refreshAll();
+      } else {
+        showPopup('❌ Cannot Cancel Credit! Need ' + Math.floor(amountToRemove) + ' coins to return.');
+      }
+    }
+
+    function flipCoin() {
+      var coinResult = '';
+      if (Math.random() < 0.5) {
+        coinResult = 'Heads';
+      } else {
+        coinResult = 'Tails';
+      }
+      var didWin = false;
+      if (Math.random() < 0.5) {
+        didWin = true;
+      }
+      var betAmount = Math.floor(Math.random() * 100) + 10;
+      var flipMessage = 'Thy coin landed on ' + coinResult + '. ';
+      var resultBox = getEl('coinFlipResult');
+      if (didWin) {
+        gold = gold + betAmount;
+        flipMessage = flipMessage + 'Thou won ' + betAmount + ' coins!';
+        logHistory('Gamble Win', 'Gambling Den', 1, betAmount);
+      } else {
+        if (gold - betAmount < -50) {
+          flipMessage = flipMessage + 'Cannot go below 50 coins debt!';
+          showPopup('🚫 Gambling Denied! Cannot exceed 50 coin debt!');
+        } else {
+          gold = gold - betAmount;
+          flipMessage = flipMessage + 'Thou lost ' + betAmount + ' coins.';
+          logHistory('Gamble Loss', 'Gambling Den', 1, -betAmount);
+        }
+      }
+      if (resultBox) {
+        resultBox.textContent = flipMessage;
+      }
+      refreshAll();
+    }
+
+    function processMonthlyCharges() {
+      for (var i = 0; i < loans.length; i++) {
+        var currentLoan = loans[i];
+        if (currentLoan.months > 0) {
+          var paymentAmount = Math.floor(currentLoan.monthlyPayment);
+          if (gold - paymentAmount >= -50) {
+            gold = gold - paymentAmount;
+            currentLoan.months = currentLoan.months - 1;
+            logHistory('Loan Payment', 'Bank', 1, -paymentAmount);
+            showPopup('⚠️ Loan Payment! Amount: ' + paymentAmount + ' coins. Months left: ' + currentLoan.months);
+            if (currentLoan.months == 0) {
+              showPopup('🎉 Loan Paid Off!');
+            }
+          } else {
+            logHistory('Loan Payment Skipped', 'Bank', 1, 0);
+            showPopup('⚠️ Loan Payment Skipped! Not enough funds.');
+          }
+        }
+      }
+      var newLoans = [];
+      for (var i = 0; i < loans.length; i++) {
+        if (loans[i].months > 0) {
+          newLoans.push(loans[i]);
+        }
+      }
+      loans = newLoans;
+      if (creditLimit > 0) {
+        var totalCharges = 0;
+        if (creditMonthlyFee > 0 && gold - creditMonthlyFee >= -50) {
+          gold = gold - creditMonthlyFee;
+          totalCharges = totalCharges + creditMonthlyFee;
+          logHistory('Credit Card Fee', 'Bank', 1, -creditMonthlyFee);
+          showPopup('💳 Credit Card Fee: ' + creditMonthlyFee + ' coins');
+        }
+        if (creditBalance > 0 && creditAnnualRate > 0) {
+          var interestCharge = Math.ceil(creditBalance * (creditAnnualRate / 12));
+          creditBalance = creditBalance + interestCharge;
+          totalCharges = totalCharges + interestCharge;
+          logHistory('Credit Interest', 'Bank', 1, -interestCharge);
+          showPopup('📈 Credit Interest Added: ' + interestCharge + ' coins');
+        }
+        if (creditBalance > 0) {
+          var minPayment = 25;
+          if (creditBalance * 0.02 > 25) {
+            minPayment = Math.ceil(creditBalance * 0.02);
+          }
+          var affordableAmount = 0;
+          if (gold + 50 > 0) {
+            affordableAmount = gold + 50;
+          }
+          var paymentAmount = minPayment;
+          if (affordableAmount < minPayment) {
+            paymentAmount = affordableAmount;
+          }
+          if (creditBalance < paymentAmount) {
+            paymentAmount = creditBalance;
+          }
+          if (paymentAmount > 0) {
+            gold = gold - paymentAmount;
+            creditBalance = creditBalance - paymentAmount;
+            totalCharges = totalCharges + paymentAmount;
+            logHistory('Credit Payment', 'Bank', 1, -paymentAmount);
+          }
+        }
+        logHistory('Credit Line Refreshed', 'Bank', 1, 0);
+      }
+      refreshAll();
+    }
+
+    function updateTitle() {
+      var total = gold;
+      for (var name in portfolio) {
+        var holding = portfolio[name];
+        if (holding && holding.shares > 0) {
+          var stock = null;
+          for (var index = 0; index < stocks.length; index++) {
+            if (stocks[index].name == name) {
+              stock = stocks[index];
+              break;
+            }
+          }
+          if (stock) {
+            total = total + (holding.shares * stock.price);
+          }
+        }
+      }
+      var title = 'Peasant';
+      if (total >= 5000) {
+        title = 'King';
+      } else if (total >= 3000) {
+        title = 'Duke';
+      } else if (total >= 2000) {
+        title = 'Baron';
+      } else if (total >= 1000) {
+        title = 'Knight';
+      } else if (total >= 500) {
+        title = 'Squire';
+      }
+      if (title != currentTitle && currentTitle != 'Peasant') {
+        showPopup('👑 Noble Title Changed! Thou art now a ' + title + '! Total wealth: ' + Math.floor(total) + ' coins');
+      }
+      currentTitle = title;
+      var titleDisplay = getEl('nobleTitle');
+      if (titleDisplay) {
+        titleDisplay.textContent = title;
+      }
+    }
+
+    function saveState() {
+      var gameState = {};
+      gameState.gold = gold;
+      gameState.portfolio = portfolio;
+      gameState.tradeEntries = tradeEntries;
+      gameState.loans = loans;
+      gameState.creditLimit = creditLimit;
+      gameState.creditBalance = creditBalance;
+      gameState.creditMonthlyFee = creditMonthlyFee;
+      gameState.creditAnnualRate = creditAnnualRate;
+      gameState.allowAlerts = allowAlerts;
+      var stateString = JSON.stringify(gameState);
+      localStorage.setItem('medievalBankState', stateString);
+    }
+
+    function loadState() {
+      var savedData = localStorage.getItem('medievalBankState');
+      if (savedData) {
+        try {
+          var state = JSON.parse(savedData);
+          if (typeof state.gold == 'number') {
+            gold = state.gold;
+          } else {
+            gold = 100;
+          }
+          if (state.portfolio) {
+            portfolio = state.portfolio;
+          } else {
+            portfolio = {};
+          }
+          if (state.tradeEntries && state.tradeEntries instanceof Array) {
+            tradeEntries = state.tradeEntries;
+          } else {
+            tradeEntries = [];
+          }
+          if (state.loans && state.loans instanceof Array) {
+            loans = state.loans;
+          } else {
+            loans = [];
+          }
+          if (state.creditLimit) {
+            creditLimit = state.creditLimit;
+          } else {
+            creditLimit = 0;
+          }
+          if (state.creditBalance) {
+            creditBalance = state.creditBalance;
+          } else {
+            creditBalance = 0;
+          }
+          if (state.creditMonthlyFee) {
+            creditMonthlyFee = state.creditMonthlyFee;
+          } else {
+            creditMonthlyFee = 0;
+          }
+          if (state.creditAnnualRate) {
+            creditAnnualRate = state.creditAnnualRate;
+          } else {
+            creditAnnualRate = 0;
+          }
+          if (state.allowAlerts == false) {
+            allowAlerts = false;
+          } else {
+            allowAlerts = true;
+          }
+        } catch (err) {
+          console.warn('Error loading state: ', err);
+        }
+      }
+      var alertSetting = localStorage.getItem('medievalBankPopups');
+      if (alertSetting == 'false') {
+        allowAlerts = false;
+      }
+      refreshAll();
+    }
+
+    function resetState() {
+      var confirmReset = confirm('Art thou sure? This will wipe all thy progress.');
+      if (confirmReset == false) {
+        return;
+      }
+      gold = 100;
+      portfolio = {};
+      tradeEntries = [];
+      loans = [];
+      creditLimit = 0;
+      creditBalance = 0;
+      creditMonthlyFee = 0;
+      creditAnnualRate = 0;
+      allowAlerts = true;
+      currentTitle = 'Peasant';
+      localStorage.removeItem('medievalBankState');
+      localStorage.removeItem('medievalBankPopups');
+      var outputBox = getEl('output');
+      if (outputBox) {
+        outputBox.textContent = 'Thy journey is reset. Start anew!';
+      }
+      refreshAll();
+    }
+
+    function bindEvents() {
+      var creditDropdown = getEl('credit');
+      creditDropdown.onchange = function() {
+        var creditSection = getEl('creditLimitSection');
+        var loanSection = getEl('loanAmountSection');
+        if (creditDropdown.value == 'credit') {
+          if (creditSection) {
+            creditSection.style.display = 'block';
+          }
+          if (loanSection) {
+            loanSection.style.display = 'none';
+          }
+        } else if (creditDropdown.value == 'loan') {
+          if (creditSection) {
+            creditSection.style.display = 'none';
+          }
+          if (loanSection) {
+            loanSection.style.display = 'block';
+          }
+        } else {
+          if (creditSection) {
+            creditSection.style.display = 'none';
+          }
+          if (loanSection) {
+            loanSection.style.display = 'none';
+          }
+        }
+      };
+      var submitButton = getEl('submitBank');
+      submitButton.onclick = handleBankRequest;
+      var resetButton = getEl('resetBank');
+      submitButton.onclick = handleBankRequest;
+      var resetButton = getEl('resetBank');
+      resetButton.onclick = function() {
+        var nameInput = getEl('name');
+        if (nameInput) {
+          nameInput.value = '';
+        }
+        var creditInput = getEl('credit');
+        if (creditInput) {
+          creditInput.value = '';
+        }
+        var limitInput = getEl('limit');
+        if (limitInput) {
+          limitInput.value = '';
+        }
+        var loanInput = getEl('loan');
+        if (loanInput) {
+          loanInput.value = '';
+        }
+        var scoreInput = getEl('score');
+        if (scoreInput) {
+          scoreInput.value = '';
+        }
+        var monthsInput = getEl('months');
+        if (monthsInput) {
+          monthsInput.value = '';
+        }
+        var creditSection = getEl('creditLimitSection');
+        if (creditSection) {
+          creditSection.style.display = 'none';
+        }
+        var loanSection = getEl('loanAmountSection');
+        if (loanSection) {
+          loanSection.style.display = 'none';
+        }
+        var outputBox = getEl('output');
+        if (outputBox) {
+          outputBox.textContent = '';
+        }
+      };
+      var tradeButton = getEl('executeTrade');
+      tradeButton.onclick = executeTrade;
+      var tradeAmountInput = getEl('tradeAmount');
+      tradeAmountInput.oninput = handleTradePreview;
+      var stockDropdown = getEl('selectedStock');
+      stockDropdown.onchange = function() {
+        var quickBuyButton = getEl('buyOneQuick');
+        if (stockDropdown.value) {
+          if (quickBuyButton) {
+            quickBuyButton.style.display = 'inline-block';
+          }
+        } else {
+          if (quickBuyButton) {
+            quickBuyButton.style.display = 'none';
+          }
+        }
+        handleTradePreview();
+      };
+      var tradeTypeDropdown = getEl('tradeType');
+      tradeTypeDropdown.onchange = function() {
+        var paymentSection = getEl('paymentMethodSection');
+        if (paymentSection) {
+          if (tradeTypeDropdown.value == 'buy' && creditLimit > 0) {
+            paymentSection.style.display = 'block';
+          } else {
+            paymentSection.style.display = 'none';
+          }
+        }
+      };
+      var quickBuyButton = getEl('buyOneQuick');
+      quickBuyButton.onclick = function() {
+        var stockName = getEl('selectedStock').value;
+        if (stockName) {
+          buySingleShare(stockName);
+        }
+      };
+      var gambleButton = getEl('gambleBtn');
+      gambleButton.onclick = flipCoin;
+      var cancelCreditButton = getEl('cancelCreditBtn');
+      cancelCreditButton.onclick = cancelCreditLine;
+      var resetProgressButton = getEl('resetProgressBtn');
+      resetProgressButton.onclick = resetState;
+      var darkToggleButton = getEl('darkToggle');
+      darkToggleButton.onclick = function() {
+        var body = document.body;
+        if (body.classList.contains('dark')) {
+          body.classList.remove('dark');
+        } else {
+          body.classList.add('dark');
+        }
+      };
+      var musicButton = getEl('toggleMusic');
+      musicButton.onclick = function() {
+        var audio = getEl('tavernMusic');
+        if (!audio) {
+          return;
+        }
+        if (audio.paused) {
+          audio.play();
+        } else {
+          audio.pause();
+        }
+      };
+      document.addEventListener('scroll', function() {
+        var controls = document.querySelector('.header-controls');
+        var formContainer = document.querySelector('.container');
+        if (!controls || !formContainer) {
+          return;
+        }
+        var rect = formContainer.getBoundingClientRect();
+        if (rect.bottom < 0) {
+          controls.style.display = 'none';
+        } else {
+          controls.style.display = 'block';
+        }
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+      populateDropdown();
       renderStocks();
       renderPortfolio();
-      populateStockDropdown();
-      renderStockHistory();
-      renderTransactionHistory();
-      setInterval(updateStocks, 3000);
+      renderHistory();
+      updateBalances();
+      updateCreditDisplay();
+      updateLoanDisplay();
+      bindEvents();
+      loadState();
+      setTimeout(function() {
+        updateTitle();
+      }, 200);
+      setInterval(function() {
+        updateStocks();
+      }, 3000);
+      setInterval(function() {
+        processMonthlyCharges();
+      }, 60000);
+      setInterval(function() {
+        saveState();
+        updateTitle();
+      }, 3000);
     });
   </script>
 </body>
