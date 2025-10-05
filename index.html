@@ -56,8 +56,33 @@
       <option value="credit">Credit</option>
       <option value="loan">Loan</option>
     </select>
+    <div id="creditLimitSection" style="display:none;">
+      <label for="limit">Declare thy desired credit limit:</label>
+      <input id="limit" type="number" min="0" placeholder="Desired credit limit">
+    </div>
+    <div id="loanAmountSection" style="display:none;">
+      <label for="loan">State thy loan amount:</label>
+      <input id="loan" type="number" min="0" placeholder="Loan amount">
+    </div>
     <label for="score">Reveal thy credit score (300–850):</label>
     <input id="score" type="number" min="300" max="850" placeholder="300 - 850">
   </div>
+  <script>
+    var creditDropdown = document.getElementById('credit');
+    creditDropdown.onchange = function() {
+      var creditSection = document.getElementById('creditLimitSection');
+      var loanSection = document.getElementById('loanAmountSection');
+      if (creditDropdown.value == 'credit') {
+        creditSection.style.display = 'block';
+        loanSection.style.display = 'none';
+      } else if (creditDropdown.value == 'loan') {
+        creditSection.style.display = 'none';
+        loanSection.style.display = 'block';
+      } else {
+        creditSection.style.display = 'none';
+        loanSection.style.display = 'none';
+      }
+    };
+  </script>
 </body>
 </html>
