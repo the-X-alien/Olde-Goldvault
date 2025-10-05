@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Olde Goldvault & Stock Exchange</title>
+  <title>Olde Goldvault</title>
   <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -11,18 +11,16 @@
       --paper: #fffaf0;
       --paper-2: #deb887;
       --accent: #a0522d;
-      --dark-bg: #2f2f2f;
-      --dark-paper: #3b3b3b;
-      --text-dark: #3b2f2f;
     }
-    * { box-sizing: border-box; }
     body {
       margin: 0;
-      min-height: 100vh;
       font-family: 'MedievalSharp', cursive;
       background: linear-gradient(45deg,#f4e4bc 0%,#e8d5a3 50%,#dcc485 100%);
-      color: var(--text-dark);
-      line-height: 1.4;
+      text-align: center;
+    }
+    h1 {
+      margin: 18px 0;
+      font-size: 2.6rem;
     }
     .container {
       max-width: 940px;
@@ -33,25 +31,12 @@
       border-radius: 16px;
       box-shadow: 0 6px 30px rgba(0,0,0,0.45);
     }
-    h1 {
-      margin: 0 0 18px;
-      text-align: center;
-      font-size: 2.6rem;
-    }
-    h2 {
-      margin: 18px 0 10px;
-      font-size: 1.8rem;
-      text-align: center;
-    }
-    h3 {
-      margin: 16px 0 8px;
-    }
     label {
       display: block;
       margin-top: 16px;
       font-size: 1.05rem;
     }
-    input[type="text"], input[type="number"], select {
+    input, select {
       width: 100%;
       padding: 10px;
       margin-top: 8px;
@@ -89,23 +74,6 @@
       font-weight: 700;
       margin-top: 12px;
     }
-    .header-controls {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      z-index: 1000;
-    }
-    .center-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 12px;
-    }
-    .center-section > * {
-      width: 100%;
-      max-width: 760px;
-    }
     .stock-table {
       width: 100%;
       border-collapse: collapse;
@@ -120,86 +88,10 @@
     .stock-table th {
       background: var(--paper-2);
     }
-    #tradeHistory {
-      max-height: 260px;
-      overflow: auto;
-      padding: 12px;
-      background: var(--paper);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      list-style: none;
-      margin: 0;
-    }
-    #tradeHistory li {
-      margin-bottom: 6px;
-    }
-    .loan-box {
-      margin: 10px 0;
-      padding: 14px;
-      background: var(--paper);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-    }
-    .medieval-popup {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(245,222,179,0.97);
-      border: 3px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
-      max-width: 440px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
-      z-index: 2000;
-    }
-    .medieval-popup button {
-      margin-top: 12px;
-      background: var(--border);
-    }
-    body.dark {
-      background: var(--dark-bg);
-      color: #f5f5dc;
-    }
-    body.dark .container {
-      background: rgba(45,45,45,0.95);
-      border-color: #d2b48c;
-    }
-    body.dark input, body.dark select {
-      background: var(--dark-paper);
-      color: #f5f5dc;
-    }
-    body.dark .stock-table th {
-      background: #4b4b4b;
-      color: #f5f5dc;
-    }
-    body.dark .stock-table td {
-      background: #3b3b3b;
-      color: #f5f5dc;
-    }
-    body.dark #tradeHistory {
-      background: #3b3b3b;
-      color: #f5f5dc;
-    }
-    @media (max-width: 780px) {
-      .container {
-        width: 92%;
-        padding: 20px;
-      }
-      h1 {
-        font-size: 2rem;
-      }
-      button, input, select {
-        font-size: 1rem;
-      }
-    }
   </style>
 </head>
 <body>
   <div id="topCoinBalance">Coins: <span id="headerGoldBalance">100</span> 🪙</div>
-  <div class="header-controls">
-    <button id="darkToggle" type="button" title="Toggle dark mode">🌙</button>
-  </div>
   <div class="container">
     <h1>Olde Goldvault</h1>
     <label for="name">What be thy name?</label>
@@ -241,98 +133,8 @@
       </table>
     </div>
   </div>
-  <div class="container center-section">
-    <div style="width:100%;">
-      <h2>Gambling Den</h2>
-      <button id="gambleBtn" type="button">Gamble!</button>
-      <div id="coinFlipResult" style="margin-top:8px;"></div>
-    </div>
-    <div id="creditCardSection" style="display:none; width:100%;">
-      <h2>Credit Remaining: <span id="availableCredit">0</span> coins</h2>
-    </div>
-    <div style="width:100%;">
-      <h2>Trade Thy Holdings</h2>
-      <label for="selectedStock">Choose thy Guild to trade:</label>
-      <select id="selectedStock"></select>
-      <label for="tradeType">Will thou Buy or Sell?</label>
-      <select id="tradeType">
-        <option value="buy">Buy</option>
-        <option value="sell">Sell</option>
-      </select>
-      <label for="tradeAmount">How many shares?</label>
-      <input id="tradeAmount" type="number" min="1" placeholder="Number of shares">
-      <div id="paymentMethodSection" style="display:none; margin-top:10px;">
-        <label for="paymentMethod">Choose thy payment method:</label>
-        <select id="paymentMethod">
-          <option value="gold">Use Gold Balance</option>
-          <option value="credit">Use Available Credit</option>
-        </select>
-      </div>
-      <div style="display:flex; gap:10px; margin-top:10px;">
-        <button id="executeTrade" type="button">Execute Trade</button>
-        <button id="buyOneQuick" type="button" style="display:none;">Buy 1 (Quick)</button>
-      </div>
-      <div id="tradeResult" style="margin-top:14px;"></div>
-    </div>
-    <div style="width:100%;">
-      <h2>Thy Portfolio</h2>
-      <div>Gold Balance: <span id="goldBalance">100</span> 🪙</div>
-      <table class="stock-table" style="margin-top:12px;">
-        <thead>
-          <tr>
-            <th>Guild</th>
-            <th>Shares</th>
-            <th>Avg Buy Price</th>
-            <th>Current Price</th>
-            <th>Value (Gold)</th>
-            <th>Profit/Loss</th>
-            <th>Sell All</th>
-            <th>Buy 1</th>
-          </tr>
-        </thead>
-        <tbody id="portfolioBody"></tbody>
-      </table>
-    </div>
-  </div>
-  <div class="container center-section">
-    <h2>Thy Ledger of Trades</h2>
-    <ul id="tradeHistory"></ul>
-    <div style="width:100%;">
-      <h2>Manage Thy Debts</h2>
-      <div id="loanContainer"></div>
-      <div id="creditManagement" style="display:none; margin:12px 0; padding:14px; background:var(--paper); border:2px solid var(--border); border-radius:10px;">
-        <h3>Active Credit Line</h3>
-        <div>Credit Limit: <span id="creditLimitDisplay">0</span> coins</div>
-        <div>Available Credit: <span id="availableCreditDisplay">0</span> coins</div>
-        <div>Monthly Fee: <span id="creditFeeDisplay">0</span> coins</div>
-        <button id="cancelCreditBtn" type="button" style="background:#d2691e;">Cancel Credit Line</button>
-      </div>
-    </div>
-    <div id="creditBalanceSection" style="display:none; width:100%; padding:14px; background:var(--paper); border-radius:10px; border:2px solid var(--border);">
-      <h3>Credit Card Balance</h3>
-      <div>Outstanding Balance: <span id="creditBalanceDisplay">0</span> coins</div>
-      <div>Interest Rate: <span id="creditRateDisplay">0</span>% APR</div>
-    </div>
-    <div style="width:100%; margin-top:18px;">
-      <h2>Thy Noble Title: <span id="nobleTitle">Peasant</span></h2>
-      <button id="resetProgressBtn" type="button">Reset Thy Journey</button>
-    </div>
-  </div>
-  <div class="container center-section">
-    <button id="toggleMusic" type="button">Toggle Music</button>
-    <audio id="tavernMusic" src="medieval-citytavern-ambient-235876.mp3" loop></audio>
-  </div>
   <script>
     var gold = 100;
-    var portfolio = {};
-    var tradeEntries = [];
-    var loans = [];
-    var creditLimit = 0;
-    var creditBalance = 0;
-    var creditMonthlyFee = 0;
-    var creditAnnualRate = 0;
-    var allowAlerts = true;
-    var currentTitle = 'Peasant';
     var guildNames = [];
     guildNames[0] = "Blacksmith Bros";
     guildNames[1] = "Golden Anvil Co";
@@ -344,106 +146,6 @@
     guildNames[7] = "Royal Bakery";
     guildNames[8] = "Moonlight Brewers";
     guildNames[9] = "Sunrise Farms";
-    guildNames[10] = "Dragon Scale Armor";
-    guildNames[11] = "Mystic Potions Inc";
-    guildNames[12] = "Thunder Valley Mining";
-    guildNames[13] = "Crystal Creek Mills";
-    guildNames[14] = "Falcon Transport";
-    guildNames[15] = "Emerald Gardens";
-    guildNames[16] = "Phoenix Fire Works";
-    guildNames[17] = "Shadow Creek Goods";
-    guildNames[18] = "Starlight Textiles";
-    guildNames[19] = "River Stone Quarry";
-    guildNames[20] = "Golden Wheat Co";
-    guildNames[21] = "Silver Bell Taverns";
-    guildNames[22] = "Copper Coin Bank";
-    guildNames[23] = "Jade Mountain Tea";
-    guildNames[24] = "Ruby Red Wine";
-    guildNames[25] = "Sapphire Jewelry";
-    guildNames[26] = "Diamond Dust Mining";
-    guildNames[27] = "Pearl Harbor Trading";
-    guildNames[28] = "Amber Light Candles";
-    guildNames[29] = "Ivory Tower Books";
-    guildNames[30] = "Bronze Shield Security";
-    guildNames[31] = "Platinum Partners";
-    guildNames[32] = "Steel Works United";
-    guildNames[33] = "Coal Creek Energy";
-    guildNames[34] = "Salt Water Solutions";
-    guildNames[35] = "Honey Bee Farms";
-    guildNames[36] = "Maple Leaf Syrup";
-    guildNames[37] = "Pine Forest Lumber";
-    guildNames[38] = "Oak Tree Furniture";
-    guildNames[39] = "Willow Branch Baskets";
-    guildNames[40] = "Rose Petal Perfumes";
-    guildNames[41] = "Lavender Fields";
-    guildNames[42] = "Mint Leaf Medicine";
-    guildNames[43] = "Sage Wisdom Scrolls";
-    guildNames[44] = "Thyme & Spice Co";
-    guildNames[45] = "Crimson Cloak Tailors";
-    guildNames[46] = "Azure Sky Shipping";
-    guildNames[47] = "Verdant Valley Produce";
-    guildNames[48] = "Cobalt Blue Dyes";
-    guildNames[49] = "Scarlet Thread Weavers";
-    guildNames[50] = "Northern Winds Trading";
-    guildNames[51] = "Southern Cross Merchants";
-    guildNames[52] = "Eastern Dawn Exports";
-    guildNames[53] = "Western Sunset Imports";
-    guildNames[54] = "Central Market Hub";
-    guildNames[55] = "Highland Stone Works";
-    guildNames[56] = "Lowland Marsh Goods";
-    guildNames[57] = "Mountain Peak Supplies";
-    guildNames[58] = "Valley Floor Mills";
-    guildNames[59] = "Riverside Commerce";
-    guildNames[60] = "Forest Edge Outfitters";
-    guildNames[61] = "Desert Bloom Trading";
-    guildNames[62] = "Tundra Fox Furs";
-    guildNames[63] = "Tropical Fruit Co";
-    guildNames[64] = "Arctic Ice Works";
-    guildNames[65] = "Storm Cloud Brewing";
-    guildNames[66] = "Calm Waters Fishing";
-    guildNames[67] = "Wild Horse Stables";
-    guildNames[68] = "Gentle Lamb Wool";
-    guildNames[69] = "Fierce Lion Security";
-    guildNames[70] = "Swift Eagle Couriers";
-    guildNames[71] = "Wise Owl Libraries";
-    guildNames[72] = "Busy Bee Honey";
-    guildNames[73] = "Sleepy Cat Inns";
-    guildNames[74] = "Loyal Dog Guards";
-    guildNames[75] = "Noble Hart Hunting";
-    guildNames[76] = "Clever Fox Trading";
-    guildNames[77] = "Strong Bear Logging";
-    guildNames[78] = "Quick Rabbit Delivery";
-    guildNames[79] = "Proud Peacock Fashion";
-    guildNames[80] = "Brave Wolf Pack";
-    guildNames[81] = "Free Bird Airways";
-    guildNames[82] = "Deep Root Farming";
-    guildNames[83] = "Bright Star Navigation";
-    guildNames[84] = "Dark Moon Mysteries";
-    guildNames[85] = "Fresh Spring Water";
-    guildNames[86] = "Ancient Oak Furniture";
-    guildNames[87] = "New Dawn Industries";
-    guildNames[88] = "Old Mill Grain";
-    guildNames[89] = "Young Sprout Gardens";
-    guildNames[90] = "Elder Sage Consulting";
-    guildNames[91] = "Master Craft Tools";
-    guildNames[92] = "Apprentice Learn Co";
-    guildNames[93] = "Journey's End Inns";
-    guildNames[94] = "Adventure Gear Ltd";
-    guildNames[95] = "Castle Wall Defense";
-    guildNames[96] = "Tower Bridge Engineering";
-    guildNames[97] = "Gate Keep Security";
-    guildNames[98] = "Moat Water Management";
-    guildNames[99] = "Drawbridge Mechanics";
-    guildNames[100] = "Crown Jewel Mining";
-    guildNames[101] = "Royal Court Services";
-    guildNames[102] = "Noble House Estates";
-    guildNames[103] = "Peasant Market Goods";
-    guildNames[104] = "Knight Armor Works";
-    guildNames[105] = "Merchant Guild Alliance";
-    guildNames[106] = "Artisan Craft Union";
-    guildNames[107] = "Farmer Harvest Co-op";
-    guildNames[108] = "Fisher Net Collective";
-    guildNames[109] = "Hunter Track Society";
     var stocks = [];
     var stockIndex = 0;
     for (var i = 0; i < guildNames.length; i++) {
@@ -457,83 +159,75 @@
       stocks[stockIndex] = tempStock;
       stockIndex = stockIndex + 1;
     }
-    function getEl(elementId) {
-      var foundElement = document.getElementById(elementId);
-      return foundElement;
-    }
-    function setText(elementToChange, newText) {
-      if (elementToChange) {
-        elementToChange.textContent = newText;
-      }
-    }
-    function showPopup(messageToShow) {
-      if (allowAlerts == false) {
-        return;
-      }
-      var existingPopup = document.querySelector('.medieval-popup');
-      if (existingPopup) {
-        existingPopup.remove();
-      }
-      var newPopup = document.createElement('div');
-      newPopup.className = 'medieval-popup';
-      var uniqueHideId = 'hideAlerts' + Date.now();
-      var popupHtml = '';
-      popupHtml = popupHtml + '<div>' + messageToShow + '</div>';
-      popupHtml = popupHtml + '<label style="display:flex;align-items:center;margin-top:10px;font-size:0.9rem;">';
-      popupHtml = popupHtml + '<input id="' + uniqueHideId + '" type="checkbox" style="margin-right:8px;">Do not show these alerts again';
-      popupHtml = popupHtml + '</label>';
-      popupHtml = popupHtml + '<div style="text-align:right;">';
-      popupHtml = popupHtml + '<button type="button" id="closePopup">Close</button>';
-      popupHtml = popupHtml + '</div>';
-      newPopup.innerHTML = popupHtml;
-      document.body.appendChild(newPopup);
-      var closeButton = newPopup.querySelector('#closePopup');
-      closeButton.addEventListener('click', function() {
-        var hideCheckbox = newPopup.querySelector('#' + uniqueHideId);
-        if (hideCheckbox && hideCheckbox.checked) {
-          allowAlerts = false;
-          localStorage.setItem('medievalBankPopups', 'false');
-          saveState();
-        }
-        newPopup.remove();
-      });
-    }
-    function logHistory(actionText, itemName, amountNumber, valueNumber) {
-      var currentTime = new Date().toLocaleTimeString();
-      var historyEntry = '';
-      if (itemName == 'Bank') {
-        historyEntry = currentTime + ' — ' + actionText + ': ' + Math.floor(valueNumber) + ' coins';
-      } else {
-        historyEntry = currentTime + ' — ' + actionText + ' ' + amountNumber + ' shares of ' + itemName + ' for ' + Math.floor(valueNumber) + ' coins';
-      }
-      tradeEntries.unshift(historyEntry);
-      if (tradeEntries.length > 200) {
-        tradeEntries.pop();
-      }
-      renderHistory();
-    }
-    function refreshAll() {
-      updateBalances();
-      updateCreditDisplay();
-      updateLoanDisplay();
-      renderPortfolio();
-      renderHistory();
-      updateTitle();
-    }
-    function updateBalances() {
-      var headerBalanceElement = getEl('headerGoldBalance');
-      if (headerBalanceElement) {
-        headerBalanceElement.textContent = Math.floor(gold);
-      }
-      var goldBalanceElement = getEl('goldBalance');
-      if (goldBalanceElement) {
-        goldBalanceElement.textContent = Math.floor(gold);
-      }
-    }
     function renderStocks() {
-      var stockTableBody = getEl('stockBody');
-      if (stockTableBody == null) {
+      var stockTableBody = document.getElementById('stockBody');
+      stockTableBody.innerHTML = '';
+      for (var i = 0; i < stocks.length; i++) {
+        var newRow = document.createElement('tr');
+        var nameCell = document.createElement('td');
+        nameCell.textContent = stocks[i].name;
+        var priceCell = document.createElement('td');
+        priceCell.textContent = stocks[i].price;
+        var changeCell = document.createElement('td');
+        changeCell.textContent = '0.00';
+        newRow.appendChild(nameCell);
+        newRow.appendChild(priceCell);
+        newRow.appendChild(changeCell);
+        stockTableBody.appendChild(newRow);
+      }
+    }
+    var creditDropdown = document.getElementById('credit');
+    creditDropdown.onchange = function() {
+      var creditSection = document.getElementById('creditLimitSection');
+      var loanSection = document.getElementById('loanAmountSection');
+      if (creditDropdown.value == 'credit') {
+        creditSection.style.display = 'block';
+        loanSection.style.display = 'none';
+      } else if (creditDropdown.value == 'loan') {
+        creditSection.style.display = 'none';
+        loanSection.style.display = 'block';
+      } else {
+        creditSection.style.display = 'none';
+        loanSection.style.display = 'none';
+      }
+    };
+    var resetButton = document.getElementById('resetBank');
+    resetButton.onclick = function() {
+      var nameInput = document.getElementById('name');
+      nameInput.value = '';
+      var creditInput = document.getElementById('credit');
+      creditInput.value = '';
+      var limitInput = document.getElementById('limit');
+      limitInput.value = '';
+      var loanInput = document.getElementById('loan');
+      loanInput.value = '';
+      var scoreInput = document.getElementById('score');
+      scoreInput.value = '';
+      var monthsInput = document.getElementById('months');
+      monthsInput.value = '';
+      var creditSection = document.getElementById('creditLimitSection');
+      creditSection.style.display = 'none';
+      var loanSection = document.getElementById('loanAmountSection');
+      loanSection.style.display = 'none';
+      var outputBox = document.getElementById('output');
+      outputBox.textContent = '';
+    };
+    var submitButton = document.getElementById('submitBank');
+    submitButton.onclick = function() {
+      var userName = document.getElementById('name').value;
+      var creditOrLoan = document.getElementById('credit').value;
+      var outputBox = document.getElementById('output');
+      if (!creditOrLoan) {
+        outputBox.textContent = 'Pick Credit or Loan to continue.';
         return;
       }
-      stockTableBody.innerHTML = '';
-      for (var stockCounter = 0; stockCounter < stocks.length; stockCounter++) {
+      var message = 'Let us handle thy banking needs.\n';
+      message = message + 'Fare thee well, ' + userName + '.\n';
+      outputBox.textContent = message;
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+      renderStocks();
+    });
+  </script>
+</body>
+</html>
