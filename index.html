@@ -170,6 +170,20 @@
       <button id="executeTrade" type="button">Execute Trade</button>
       <div id="tradeResult" style="margin-top:14px;"></div>
     </div>
+    <div style="margin-top:28px;">
+      <h1>Stock History</h1>
+      <label for="historyStock">Select Guild to view history:</label>
+      <select id="historyStock" onchange="renderStockHistory()"></select>
+      <table class="stock-table" style="margin-top:12px;">
+        <thead>
+          <tr>
+            <th>Update</th>
+            <th>Price (Gold)</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
   </div>
   <script>
     var gold = 100;
@@ -205,6 +219,7 @@
       randomPrice = randomPrice + 10;
       tempStock.price = Math.floor(randomPrice);
       tempStock.change = 0;
+      tempStock.history = [tempStock.price];
       stocks[stockIndex] = tempStock;
       stockIndex = stockIndex + 1;
     }
@@ -240,9 +255,14 @@
           newPrice = 1;
         }
         stocks[i].price = Math.floor(newPrice);
+        stocks[i].history.push(stocks[i].price);
+        if (stocks[i].history.length > 5) {
+          stocks[i].history.shift();
+        }
       }
       renderStocks();
       renderPortfolio();
+      renderStockHistory();
     }
     function calculatePortfolioValue() {
       var totalValue = gold;
@@ -297,18 +317,50 @@
     }
     function populateStockDropdown() {
       var stockDropdown = document.getElementById('selectedStock');
+      var historyDropdown = document.getElementById('historyStock');
       stockDropdown.innerHTML = '';
+      historyDropdown.innerHTML = '';
       var defaultOption = document.createElement('option');
       defaultOption.value = '';
       defaultOption.textContent = 'Select a Guild...';
       defaultOption.disabled = true;
       defaultOption.selected = true;
       stockDropdown.appendChild(defaultOption);
+      var historyDefault = defaultOption.cloneNode(true);
+      historyDropdown.appendChild(historyDefault);
       for (var i = 0; i < stocks.length; i++) {
         var newOption = document.createElement('option');
         newOption.value = stocks[i].name;
         newOption.textContent = stocks[i].name;
         stockDropdown.appendChild(newOption);
+        historyDropdown.appendChild(newOption.cloneNode(true));
+      }
+    }
+    function renderStockHistory() {
+      var selectedStock = document.getElementById('historyStock').value;
+      var historyBody = document.getElementById('historyBody');
+      historyBody.innerHTML = '';
+      if (!selectedStock) {
+        return;
+      }
+      var stockFound = null;
+      for (var i = 0; i < stocks.length; i++) {
+        if (stocks[i].name == selectedStock) {
+          stockFound = stocks[i];
+          break;
+        }
+      }
+      if (stockFound != null) {
+        for (var j = stockFound.history.length - 1; j >= 0; j--) {
+          var newRow = document.createElement('tr');
+          var updateCell = document.createElement('td');
+          updateCell.textContent = 'Update ' + (stockFound.history.length - j);
+          var priceCell = document.createElement('td');
+          priceCell.textContent = stockFound.history[j];
+          newRow.appendChild(updateCell);
+          newRow.appendChild(priceCell);
+          historyBody.appendChild(newRow);
+        }
       }
     }
     function executeTrade() {
@@ -423,6 +475,7 @@
       renderStocks();
       renderPortfolio();
       populateStockDropdown();
+      renderStockHistory();
       setInterval(updateStocks, 3000);
     });
   </script>
