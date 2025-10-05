@@ -135,6 +135,7 @@
             <th>Guild</th>
             <th>Price (Gold)</th>
             <th>Change</th>
+            <th>Volatility</th>
           </tr>
         </thead>
         <tbody id="stockBody"></tbody>
@@ -237,6 +238,7 @@
     guildNames[19] = "River Stone Quarry";
     var stocks = [];
     var stockIndex = 0;
+    var volatilities = ['Low', 'Medium', 'High'];
     for (var i = 0; i < guildNames.length; i++) {
       var tempGuildName = guildNames[i];
       var tempStock = {};
@@ -246,6 +248,7 @@
       tempStock.price = Math.floor(randomPrice);
       tempStock.change = 0;
       tempStock.history = [tempStock.price];
+      tempStock.volatility = volatilities[Math.floor(Math.random() * 3)];
       stocks[stockIndex] = tempStock;
       stockIndex = stockIndex + 1;
     }
@@ -266,15 +269,26 @@
         } else if (stocks[i].change < 0) {
           changeCell.className = 'negative';
         }
+        var volatilityCell = document.createElement('td');
+        volatilityCell.textContent = stocks[i].volatility;
         newRow.appendChild(nameCell);
         newRow.appendChild(priceCell);
         newRow.appendChild(changeCell);
+        newRow.appendChild(volatilityCell);
         stockTableBody.appendChild(newRow);
       }
     }
     function updateStocks() {
       for (var i = 0; i < stocks.length; i++) {
-        var priceChange = Math.random() * 10 - 5;
+        var maxChange = 5;
+        if (stocks[i].volatility == 'Low') {
+          maxChange = 3;
+        } else if (stocks[i].volatility == 'Medium') {
+          maxChange = 5;
+        } else if (stocks[i].volatility == 'High') {
+          maxChange = 10;
+        }
+        var priceChange = Math.random() * maxChange * 2 - maxChange;
         stocks[i].change = priceChange;
         var newPrice = stocks[i].price + priceChange;
         if (newPrice < 1) {
