@@ -205,6 +205,7 @@
     var gold = 100;
     var portfolio = {};
     var transactionHistory = [];
+    var activeLoan = null;
     var guildNames = [];
     guildNames[0] = "Blacksmith Bros";
     guildNames[1] = "Golden Anvil Co";
@@ -336,6 +337,7 @@
       gold = 100;
       portfolio = {};
       transactionHistory = [];
+      activeLoan = null;
       renderPortfolio();
       renderTransactionHistory();
     }
@@ -523,14 +525,63 @@
     submitButton.onclick = function() {
       var userName = document.getElementById('name').value;
       var creditOrLoan = document.getElementById('credit').value;
+      var loanAmount = parseInt(document.getElementById('loan').value);
+      var creditScore = parseInt(document.getElementById('score').value);
+      var months = parseInt(document.getElementById('months').value);
       var outputBox = document.getElementById('output');
-      if (!creditOrLoan) {
-        outputBox.textContent = 'Pick Credit or Loan to continue.';
+      if (!userName || !creditOrLoan || isNaN(creditScore) || isNaN(months)) {
+        outputBox.textContent = 'Please complete all fields.';
         return;
       }
-      var message = 'Let us handle thy banking needs.\n';
-      message = message + 'Fare thee well, ' + userName + '.\n';
-      outputBox.textContent = message;
+      if (creditScore < 300 || creditScore > 850) {
+        outputBox.textContent = 'Credit score must be between 300 and 850.';
+        return;
+      }
+      if (months < 1) {
+        outputBox.textContent = 'Repayment period must be at least 1 month.';
+        return;
+      }
+      if (creditOrLoan == 'loan') {
+        if (isNaN(loanAmount) || loanAmount <= 0) {
+          outputBox.textContent = 'Enter a valid loan amount.';
+          return;
+        }
+        if (activeLoan != null) {
+          outputBox.textContent = 'Thou already hast an active loan.';
+          return;
+        }
+        var maxLoan = creditScore * 100;
+        if (loanAmount > maxLoan) {
+          outputBox.textContent = 'Loan amount exceeds thy creditworthiness of ' + maxLoan + ' gold.';
+          return;
+        }
+        var interestRate = 0.1;
+        if (creditScore >= 700) {
+          interestRate = 0.05;
+        } else if (creditScore >= 500) {
+          interestRate = 0.08;
+        }
+        var totalInterest = loanAmount * interestRate * months;
+        var totalRepayment = loanAmount + totalInterest;
+        var monthlyPayment = totalRepayment / months;
+        activeLoan = {
+          amount: loanAmount,
+          interestRate: interestRate,
+          totalRepayment: totalRepayment,
+          months: months,
+          monthlyPayment: monthlyPayment
+        };
+        gold = gold + loanAmount;
+        var message = 'Loan approved for ' + userName + '!\n';
+        message = message + 'Amount: ' + loanAmount + ' gold\n';
+        message = message + 'Interest Rate: ' + (interestRate * 100) + '%\n';
+        message = message + 'Total Repayment: ' + totalRepayment.toFixed(2) + ' gold\n';
+        message = message + 'Monthly Payment: ' + monthlyPayment.toFixed(2) + ' gold over ' + months + ' months\n';
+        outputBox.textContent = message;
+        renderPortfolio();
+      } else {
+        outputBox.textContent = 'Credit line processing not yet implemented.';
+      }
     };
     var tradeButton = document.getElementById('executeTrade');
     tradeButton.onclick = executeTrade;
