@@ -147,6 +147,7 @@
       <div style="margin-top:12px;">Credit Used: <span id="creditUsed">0</span> / <span id="creditLimit">0</span> 🪙</div>
       <div style="margin-top:12px;">Loan Balance: <span id="loanBalance">0</span> 🪙</div>
       <div style="margin-top:12px;">Total Portfolio Value: <span id="portfolioValue">100</span> 🪙</div>
+      <div style="margin-top:12px;">Portfolio Performance: <span id="portfolioPerformance">0</span> 🪙</div>
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
         <button id="resetPortfolio" type="button">Reset Portfolio</button>
         <button id="repayLoan" type="button">Repay Loan</button>
@@ -210,6 +211,7 @@
   </div>
   <script>
     var gold = 100;
+    var initialInvestment = 100;
     var portfolio = {};
     var transactionHistory = [];
     var activeLoan = null;
@@ -356,7 +358,8 @@
       var headerBalanceElement = document.getElementById('headerGoldBalance');
       headerBalanceElement.textContent = Math.floor(gold);
       var portfolioValueElement = document.getElementById('portfolioValue');
-      portfolioValueElement.textContent = calculatePortfolioValue();
+      var portfolioValue = calculatePortfolioValue();
+      portfolioValueElement.textContent = portfolioValue;
       var creditUsedElement = document.getElementById('creditUsed');
       creditUsedElement.textContent = Math.floor(creditUsed);
       var creditLimitElement = document.getElementById('creditLimit');
@@ -367,9 +370,19 @@
       } else {
         loanBalanceElement.textContent = '0';
       }
+      var performanceElement = document.getElementById('portfolioPerformance');
+      var performance = portfolioValue - initialInvestment;
+      if (performance > 0) {
+        performanceElement.className = 'positive';
+        performanceElement.textContent = '+' + performance.toFixed(2);
+      } else {
+        performanceElement.className = 'negative';
+        performanceElement.textContent = performance.toFixed(2);
+      }
     }
     function resetPortfolio() {
       gold = 100;
+      initialInvestment = 100;
       portfolio = {};
       transactionHistory = [];
       activeLoan = null;
@@ -655,6 +668,7 @@
           monthlyPayment: monthlyPayment
         };
         gold = gold + loanAmount;
+        initialInvestment = initialInvestment + loanAmount;
         var message = 'Loan approved for ' + userName + '!\n';
         message = message + 'Amount: ' + loanAmount + ' gold\n';
         message = message + 'Interest Rate: ' + (interestRate * 100) + '%\n';
