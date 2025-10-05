@@ -184,10 +184,26 @@
         <tbody id="historyBody"></tbody>
       </table>
     </div>
+    <div style="margin-top:28px;">
+      <h1>Transaction History</h1>
+      <table class="stock-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Guild</th>
+            <th>Shares</th>
+            <th>Price (Gold)</th>
+            <th>Total (Gold)</th>
+          </tr>
+        </thead>
+        <tbody id="transactionBody"></tbody>
+      </table>
+    </div>
   </div>
   <script>
     var gold = 100;
     var portfolio = {};
+    var transactionHistory = [];
     var guildNames = [];
     guildNames[0] = "Blacksmith Bros";
     guildNames[1] = "Golden Anvil Co";
@@ -363,6 +379,30 @@
         }
       }
     }
+    function renderTransactionHistory() {
+      var transactionBody = document.getElementById('transactionBody');
+      transactionBody.innerHTML = '';
+      for (var i = transactionHistory.length - 1; i >= 0; i--) {
+        var transaction = transactionHistory[i];
+        var newRow = document.createElement('tr');
+        var typeCell = document.createElement('td');
+        typeCell.textContent = transaction.type;
+        var guildCell = document.createElement('td');
+        guildCell.textContent = transaction.guild;
+        var sharesCell = document.createElement('td');
+        sharesCell.textContent = transaction.shares;
+        var priceCell = document.createElement('td');
+        priceCell.textContent = transaction.price;
+        var totalCell = document.createElement('td');
+        totalCell.textContent = transaction.total;
+        newRow.appendChild(typeCell);
+        newRow.appendChild(guildCell);
+        newRow.appendChild(sharesCell);
+        newRow.appendChild(priceCell);
+        newRow.appendChild(totalCell);
+        transactionBody.appendChild(newRow);
+      }
+    }
     function executeTrade() {
       var selectedStock = document.getElementById('selectedStock').value;
       var tradeType = document.getElementById('tradeType').value;
@@ -404,6 +444,13 @@
         var newAvgPrice = ((currentAvgPrice * currentShares) + (stockFound.price * tradeAmount)) / newShares;
         portfolio[selectedStock].shares = newShares;
         portfolio[selectedStock].avgBuyPrice = newAvgPrice;
+        transactionHistory.push({
+          type: 'Buy',
+          guild: selectedStock,
+          shares: tradeAmount,
+          price: stockFound.price,
+          total: totalCost
+        });
         tradeResult.textContent = 'Bought ' + tradeAmount + ' shares of ' + selectedStock + ' for ' + totalCost + ' gold.';
       } else if (tradeType == 'sell') {
         if (portfolio[selectedStock] == undefined || portfolio[selectedStock].shares < tradeAmount) {
@@ -413,12 +460,20 @@
         var totalSale = stockFound.price * tradeAmount;
         gold = gold + totalSale;
         portfolio[selectedStock].shares = portfolio[selectedStock].shares - tradeAmount;
+        transactionHistory.push({
+          type: 'Sell',
+          guild: selectedStock,
+          shares: tradeAmount,
+          price: stockFound.price,
+          total: totalSale
+        });
         tradeResult.textContent = 'Sold ' + tradeAmount + ' shares of ' + selectedStock + ' for ' + totalSale + ' gold.';
         if (portfolio[selectedStock].shares == 0) {
           delete portfolio[selectedStock];
         }
       }
       renderPortfolio();
+      renderTransactionHistory();
     }
     var creditDropdown = document.getElementById('credit');
     creditDropdown.onchange = function() {
@@ -476,6 +531,7 @@
       renderPortfolio();
       populateStockDropdown();
       renderStockHistory();
+      renderTransactionHistory();
       setInterval(updateStocks, 3000);
     });
   </script>
