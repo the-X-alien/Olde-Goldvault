@@ -134,6 +134,19 @@
       var outputBox = document.getElementById('output');
       outputBox.textContent = '';
     };
+    var submitButton = document.getElementById('submitBank');
+    submitButton.onclick = function() {
+      var userName = document.getElementById('name').value;
+      var creditOrLoan = document.getElementById('credit').value;
+      var outputBox = document.getElementById('output');
+      if (!creditOrLoan) {
+        outputBox.textContent = 'Pick Credit or Loan to continue.';
+        return;
+      }
+      var message = 'Let us handle thy banking needs.\n';
+      message = message + 'Fare thee well, ' + userName + '.\n';
+      outputBox.textContent = message;
+    };
   </script>
 </body>
 </html>
