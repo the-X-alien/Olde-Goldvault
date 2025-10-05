@@ -146,15 +146,27 @@
     guildNames[7] = "Royal Bakery";
     guildNames[8] = "Moonlight Brewers";
     guildNames[9] = "Sunrise Farms";
-    var stockTableBody = document.getElementById('stockBody');
+    var stocks = [];
+    var stockIndex = 0;
     for (var i = 0; i < guildNames.length; i++) {
+      var tempGuildName = guildNames[i];
+      var tempStock = {};
+      tempStock.name = tempGuildName;
+      var randomPrice = Math.random() * 100;
+      randomPrice = randomPrice + 10;
+      tempStock.price = Math.floor(randomPrice);
+      stocks[stockIndex] = tempStock;
+      stockIndex = stockIndex + 1;
+    }
+    var stockTableBody = document.getElementById('stockBody');
+    for (var i = 0; i < stocks.length; i++) {
       var newRow = document.createElement('tr');
       var nameCell = document.createElement('td');
-      nameCell.textContent = guildNames[i];
+      nameCell.textContent = stocks[i].name;
       var priceCell = document.createElement('td');
-      priceCell.textContent = '';
+      priceCell.textContent = stocks[i].price;
       var changeCell = document.createElement('td');
-      changeCell.textContent = '';
+      changeCell.textContent = '0.00';
       newRow.appendChild(nameCell);
       newRow.appendChild(priceCell);
       newRow.appendChild(changeCell);
