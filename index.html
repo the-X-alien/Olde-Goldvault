@@ -29,11 +29,35 @@
       border-radius: 16px;
       box-shadow: 0 6px 30px rgba(0,0,0,0.45);
     }
+    label {
+      display: block;
+      margin-top: 16px;
+      font-size: 1.05rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--paper);
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Olde Goldvault</h1>
+    <label for="name">What be thy name?</label>
+    <input id="name" type="text" placeholder="Enter thy name">
+    <label for="credit">Dost thou seek a line of credit or a loan?</label>
+    <select id="credit">
+      <option value="" selected disabled>Select...</option>
+      <option value="credit">Credit</option>
+      <option value="loan">Loan</option>
+    </select>
+    <label for="score">Reveal thy credit score (300–850):</label>
+    <input id="score" type="number" min="300" max="850" placeholder="300 - 850">
   </div>
 </body>
 </html>
