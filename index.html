@@ -135,6 +135,31 @@
   </div>
   <script>
     var gold = 100;
+    var guildNames = [];
+    guildNames[0] = "Blacksmith Bros";
+    guildNames[1] = "Golden Anvil Co";
+    guildNames[2] = "Merchant Marine Ltd";
+    guildNames[3] = "Silverstone Trading";
+    guildNames[4] = "Iron Mountain Corp";
+    guildNames[5] = "Woodland Timber";
+    guildNames[6] = "Coastal Fisheries";
+    guildNames[7] = "Royal Bakery";
+    guildNames[8] = "Moonlight Brewers";
+    guildNames[9] = "Sunrise Farms";
+    var stockTableBody = document.getElementById('stockBody');
+    for (var i = 0; i < guildNames.length; i++) {
+      var newRow = document.createElement('tr');
+      var nameCell = document.createElement('td');
+      nameCell.textContent = guildNames[i];
+      var priceCell = document.createElement('td');
+      priceCell.textContent = '';
+      var changeCell = document.createElement('td');
+      changeCell.textContent = '';
+      newRow.appendChild(nameCell);
+      newRow.appendChild(priceCell);
+      newRow.appendChild(changeCell);
+      stockTableBody.appendChild(newRow);
+    }
     var creditDropdown = document.getElementById('credit');
     creditDropdown.onchange = function() {
       var creditSection = document.getElementById('creditLimitSection');
