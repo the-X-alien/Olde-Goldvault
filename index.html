@@ -143,6 +143,7 @@
     <div style="margin-top:28px;">
       <h1>Thy Portfolio</h1>
       <div>Gold Balance: <span id="goldBalance">100</span> 🪙</div>
+      <div style="margin-top:12px;">Credit Used: <span id="creditUsed">0</span> / <span id="creditLimit">0</span> 🪙</div>
       <div style="margin-top:12px;">Total Portfolio Value: <span id="portfolioValue">100</span> 🪙</div>
       <button id="resetPortfolio" type="button" style="margin-top:12px;">Reset Portfolio</button>
       <table class="stock-table" style="margin-top:12px;">
@@ -206,6 +207,8 @@
     var portfolio = {};
     var transactionHistory = [];
     var activeLoan = null;
+    var creditLimit = 0;
+    var creditUsed = 0;
     var guildNames = [];
     guildNames[0] = "Blacksmith Bros";
     guildNames[1] = "Golden Anvil Co";
@@ -332,12 +335,18 @@
       headerBalanceElement.textContent = Math.floor(gold);
       var portfolioValueElement = document.getElementById('portfolioValue');
       portfolioValueElement.textContent = calculatePortfolioValue();
+      var creditUsedElement = document.getElementById('creditUsed');
+      creditUsedElement.textContent = Math.floor(creditUsed);
+      var creditLimitElement = document.getElementById('creditLimit');
+      creditLimitElement.textContent = Math.floor(creditLimit);
     }
     function resetPortfolio() {
       gold = 100;
       portfolio = {};
       transactionHistory = [];
       activeLoan = null;
+      creditLimit = 0;
+      creditUsed = 0;
       renderPortfolio();
       renderTransactionHistory();
     }
@@ -440,11 +449,18 @@
       }
       if (tradeType == 'buy') {
         var totalCost = stockFound.price * tradeAmount;
-        if (totalCost > gold) {
-          tradeResult.textContent = 'Not enough gold to buy ' + tradeAmount + ' shares of ' + selectedStock + '.';
+        var availableCredit = creditLimit - creditUsed;
+        if (totalCost > (gold + availableCredit)) {
+          tradeResult.textContent = 'Not enough gold or credit to buy ' + tradeAmount + ' shares of ' + selectedStock + '.';
           return;
         }
-        gold = gold - totalCost;
+        if (totalCost > gold) {
+          var creditNeeded = totalCost - gold;
+          creditUsed = creditUsed + creditNeeded;
+          gold = 0;
+        } else {
+          gold = gold - totalCost;
+        }
         if (portfolio[selectedStock] == undefined) {
           portfolio[selectedStock] = { shares: 0, avgBuyPrice: 0 };
         }
@@ -526,6 +542,7 @@
       var userName = document.getElementById('name').value;
       var creditOrLoan = document.getElementById('credit').value;
       var loanAmount = parseInt(document.getElementById('loan').value);
+      var creditLimitRequested = parseInt(document.getElementById('limit').value);
       var creditScore = parseInt(document.getElementById('score').value);
       var months = parseInt(document.getElementById('months').value);
       var outputBox = document.getElementById('output');
@@ -579,8 +596,21 @@
         message = message + 'Monthly Payment: ' + monthlyPayment.toFixed(2) + ' gold over ' + months + ' months\n';
         outputBox.textContent = message;
         renderPortfolio();
-      } else {
-        outputBox.textContent = 'Credit line processing not yet implemented.';
+      } else if (creditOrLoan == 'credit') {
+        if (isNaN(creditLimitRequested) || creditLimitRequested <= 0) {
+          outputBox.textContent = 'Enter a valid credit limit.';
+          return;
+        }
+        var maxCredit = creditScore * 50;
+        if (creditLimitRequested > maxCredit) {
+          outputBox.textContent = 'Requested credit limit exceeds thy creditworthiness of ' + maxCredit + ' gold.';
+          return;
+        }
+        creditLimit = creditLimitRequested;
+        var message = 'Credit line approved for ' + userName + '!\n';
+        message = message + 'Credit Limit: ' + creditLimit + ' gold\n';
+        outputBox.textContent = message;
+        renderPortfolio();
       }
     };
     var tradeButton = document.getElementById('executeTrade');
