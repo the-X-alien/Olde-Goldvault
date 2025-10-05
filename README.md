@@ -2,7 +2,9 @@
 A mideval themed bank!
 Music by DeusLower used under the Pixabay Content License
 
-Description
+Note: The Guild names are AI-generated.
+
+### Description
 
 Olde Goldvault is a medieval-themed simulator where you manage gold, trade stocks, and take loans or credit to build wealth. It uses HTML, CSS, and JavaScript to create an interactive experience with a medieval vibe.
 
