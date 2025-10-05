@@ -66,9 +66,17 @@
       background: rgba(255,255,255,0.65);
       white-space: pre-wrap;
     }
+    #topCoinBalance {
+      width: 100%;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 12px;
+    }
   </style>
 </head>
 <body>
+  <div id="topCoinBalance">Coins: <span id="headerGoldBalance">100</span> 🪙</div>
   <div class="container">
     <h1>Olde Goldvault</h1>
     <label for="name">What be thy name?</label>
@@ -98,6 +106,7 @@
     <div id="output" aria-live="polite"></div>
   </div>
   <script>
+    var gold = 100;
     var creditDropdown = document.getElementById('credit');
     creditDropdown.onchange = function() {
       var creditSection = document.getElementById('creditLimitSection');
