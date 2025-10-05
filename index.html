@@ -292,6 +292,53 @@
         stockDropdown.appendChild(newOption);
       }
     }
+    function executeTrade() {
+      var selectedStock = document.getElementById('selectedStock').value;
+      var tradeType = document.getElementById('tradeType').value;
+      var tradeAmount = document.getElementById('tradeAmount').value;
+      var tradeResult = document.getElementById('tradeResult');
+      tradeAmount = parseInt(tradeAmount);
+      if (!selectedStock) {
+        tradeResult.textContent = 'Please select a Guild to trade.';
+        return;
+      }
+      if (isNaN(tradeAmount) || tradeAmount <= 0) {
+        tradeResult.textContent = 'Enter a valid number of shares.';
+        return;
+      }
+      var stockFound = null;
+      for (var i = 0; i < stocks.length; i++) {
+        if (stocks[i].name == selectedStock) {
+          stockFound = stocks[i];
+          break;
+        }
+      }
+      if (stockFound == null) {
+        tradeResult.textContent = 'Guild not found.';
+        return;
+      }
+      if (tradeType == 'buy') {
+        var totalCost = stockFound.price * tradeAmount;
+        if (totalCost > gold) {
+          tradeResult.textContent = 'Not enough gold to buy ' + tradeAmount + ' shares of ' + selectedStock + '.';
+          return;
+        }
+        gold = gold - totalCost;
+        if (portfolio[selectedStock] == undefined) {
+          portfolio[selectedStock] = { shares: 0, avgBuyPrice: 0 };
+        }
+        var currentShares = portfolio[selectedStock].shares;
+        var currentAvgPrice = portfolio[selectedStock].avgBuyPrice;
+        var newShares = currentShares + tradeAmount;
+        var newAvgPrice = ((currentAvgPrice * currentShares) + (stockFound.price * tradeAmount)) / newShares;
+        portfolio[selectedStock].shares = newShares;
+        portfolio[selectedStock].avgBuyPrice = newAvgPrice;
+        tradeResult.textContent = 'Bought ' + tradeAmount + ' shares of ' + selectedStock + ' for ' + totalCost + ' gold.';
+      } else {
+        tradeResult.textContent = 'Selling not yet implemented.';
+      }
+      renderPortfolio();
+    }
     var creditDropdown = document.getElementById('credit');
     creditDropdown.onchange = function() {
       var creditSection = document.getElementById('creditLimitSection');
@@ -341,6 +388,8 @@
       message = message + 'Fare thee well, ' + userName + '.\n';
       outputBox.textContent = message;
     };
+    var tradeButton = document.getElementById('executeTrade');
+    tradeButton.onclick = executeTrade;
     document.addEventListener('DOMContentLoaded', function() {
       renderStocks();
       renderPortfolio();
