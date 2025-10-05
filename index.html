@@ -143,6 +143,7 @@
     <div style="margin-top:28px;">
       <h1>Thy Portfolio</h1>
       <div>Gold Balance: <span id="goldBalance">100</span> 🪙</div>
+      <div style="margin-top:12px;">Total Portfolio Value: <span id="portfolioValue">100</span> 🪙</div>
       <table class="stock-table" style="margin-top:12px;">
         <thead>
           <tr>
@@ -243,6 +244,22 @@
       renderStocks();
       renderPortfolio();
     }
+    function calculatePortfolioValue() {
+      var totalValue = gold;
+      for (var guildName in portfolio) {
+        var stockFound = null;
+        for (var i = 0; i < stocks.length; i++) {
+          if (stocks[i].name == guildName) {
+            stockFound = stocks[i];
+            break;
+          }
+        }
+        if (stockFound != null && portfolio[guildName].shares > 0) {
+          totalValue = totalValue + (portfolio[guildName].shares * stockFound.price);
+        }
+      }
+      return Math.floor(totalValue);
+    }
     function renderPortfolio() {
       var portfolioBody = document.getElementById('portfolioBody');
       portfolioBody.innerHTML = '';
@@ -275,6 +292,8 @@
       goldBalanceElement.textContent = Math.floor(gold);
       var headerBalanceElement = document.getElementById('headerGoldBalance');
       headerBalanceElement.textContent = Math.floor(gold);
+      var portfolioValueElement = document.getElementById('portfolioValue');
+      portfolioValueElement.textContent = calculatePortfolioValue();
     }
     function populateStockDropdown() {
       var stockDropdown = document.getElementById('selectedStock');
