@@ -149,6 +149,7 @@
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
         <button id="resetPortfolio" type="button">Reset Portfolio</button>
         <button id="repayLoan" type="button">Repay Loan</button>
+        <button id="repayCredit" type="button">Repay Credit</button>
       </div>
       <table class="stock-table" style="margin-top:12px;">
         <thead>
@@ -383,6 +384,22 @@
       } else {
         outputBox.textContent = 'Loan payment of ' + payment.toFixed(2) + ' gold made. ' + activeLoan.months + ' months remaining.';
       }
+      renderPortfolio();
+    }
+    function repayCredit() {
+      var outputBox = document.getElementById('output');
+      if (creditUsed == 0) {
+        outputBox.textContent = 'No credit used to repay.';
+        return;
+      }
+      var repaymentAmount = creditUsed;
+      if (gold < repaymentAmount) {
+        outputBox.textContent = 'Not enough gold to repay ' + repaymentAmount.toFixed(2) + ' gold of credit.';
+        return;
+      }
+      gold = gold - repaymentAmount;
+      creditUsed = 0;
+      outputBox.textContent = 'Credit of ' + repaymentAmount.toFixed(2) + ' gold fully repaid.';
       renderPortfolio();
     }
     function populateStockDropdown() {
@@ -654,6 +671,8 @@
     resetPortfolioButton.onclick = resetPortfolio;
     var repayLoanButton = document.getElementById('repayLoan');
     repayLoanButton.onclick = repayLoan;
+    var repayCreditButton = document.getElementById('repayCredit');
+    repayCreditButton.onclick = repayCredit;
     document.addEventListener('DOMContentLoaded', function() {
       renderStocks();
       renderPortfolio();
