@@ -155,6 +155,20 @@
         <tbody id="portfolioBody"></tbody>
       </table>
     </div>
+    <div style="margin-top:28px;">
+      <h1>Trade Thy Holdings</h1>
+      <label for="selectedStock">Choose thy Guild to trade:</label>
+      <select id="selectedStock"></select>
+      <label for="tradeType">Will thou Buy or Sell?</label>
+      <select id="tradeType">
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+      </select>
+      <label for="tradeAmount">How many shares?</label>
+      <input id="tradeAmount" type="number" min="1" placeholder="Number of shares">
+      <button id="executeTrade" type="button">Execute Trade</button>
+      <div id="tradeResult" style="margin-top:14px;"></div>
+    </div>
   </div>
   <script>
     var gold = 100;
@@ -259,6 +273,24 @@
       }
       var goldBalanceElement = document.getElementById('goldBalance');
       goldBalanceElement.textContent = Math.floor(gold);
+      var headerBalanceElement = document.getElementById('headerGoldBalance');
+      headerBalanceElement.textContent = Math.floor(gold);
+    }
+    function populateStockDropdown() {
+      var stockDropdown = document.getElementById('selectedStock');
+      stockDropdown.innerHTML = '';
+      var defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select a Guild...';
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      stockDropdown.appendChild(defaultOption);
+      for (var i = 0; i < stocks.length; i++) {
+        var newOption = document.createElement('option');
+        newOption.value = stocks[i].name;
+        newOption.textContent = stocks[i].name;
+        stockDropdown.appendChild(newOption);
+      }
     }
     var creditDropdown = document.getElementById('credit');
     creditDropdown.onchange = function() {
@@ -312,6 +344,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       renderStocks();
       renderPortfolio();
+      populateStockDropdown();
       setInterval(updateStocks, 3000);
     });
   </script>
